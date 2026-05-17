@@ -26,20 +26,22 @@ services:
       - DB_PASSWORD=devpassword
       - DB_NAME=cointracker
       - DB_PORT=5432
+      - ROUTER_PORT=8080
+      - ROUTER_HOST=0.0.0.0
     depends_on:
       - db
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile.dev
-    ports:
-      - "4200:4200"
-    volumes:
-      - ./frontend:/app
-      - /app/node_modules
-    depends_on:
-      - backend
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile.dev
+  #   ports:
+  #     - "4200:4200"
+  #   volumes:
+  #     - ./frontend:/app
+  #     - /app/node_modules
+  #   depends_on:
+  #     - backend
 
 volumes:
   pgdata: 
