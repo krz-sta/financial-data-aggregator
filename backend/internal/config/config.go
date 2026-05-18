@@ -8,6 +8,7 @@ import (
 type Config struct {
 	DB     *DBconfig
 	Router *RouterConfig
+	JWTKey string
 }
 
 type DBconfig struct {
@@ -49,5 +50,6 @@ func LoadConfig() *Config {
 	return &Config{
 		DB:     dbCfg,
 		Router: routerCfg,
+		JWTKey: os.Getenv("JWT_SECRET"),
 	}
 }

@@ -1,20 +1,27 @@
 package auth
 
 import (
+	"errors"
 	"financial-data-aggregator-backend/internal/models"
 	"net/http"
+	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
 
 type Handler struct {
-	DB *gorm.DB
+	DB     *gorm.DB
+	JWTKey string
 }
 
-func NewHandler(db *gorm.DB) *Handler {
-	return &Handler{DB: db}
+func NewHandler(db *gorm.DB, jwtKey string) *Handler {
+	return &Handler{
+		DB:     db,
+		JWTKey: jwtKey,
+	}
 }
 
 func (h *Handler) Register(c *gin.Context) {
@@ -55,4 +62,48 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{"data": newUser})
+}
+
+func (h *Handler) Login(c *gin.Context) {
+	var input models.AuthInput
+
+	if err := c.ShouldBindJSON(&input); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
+	var tempUsr models.User
+	err := h.DB.Model(&models.User{}).Where("email = ?", input.Email).First(&tempUsr).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(tempUsr.PasswordHash), []byte(input.Password))
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		return
+	}
+
+	// sub (Subject) - ID użytkownika
+	// exp (Expiration Time) - czas wygaśnięcia tokenu w formacie Unix
+	// iat (Issued at) - czas wydania tokenu w formacie Unix
+	claims := jwt.MapClaims{
+		"sub": tempUsr.ID.String(),
+		"exp": time.Now().Add(time.Hour * 24).Unix(),
+		"iat": time.Now().Unix(),
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	tokenString, err := token.SignedString([]byte(h.JWTKey))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"token": tokenString})
 }

@@ -2,10 +2,10 @@ package main
 
 import (
 	"financial-data-aggregator-backend/internal/config"
+	"financial-data-aggregator-backend/internal/handlers"
 	"financial-data-aggregator-backend/internal/models"
 	"fmt"
 	"log"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/postgres"
@@ -34,11 +34,7 @@ func main() {
 		log.Fatalf("Couldn't automigrate: %v", err.Error())
 	}
 
-	router.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "backen działa",
-		})
-	})
+	handlers.SetupRoutes(router, db, cfg.JWTKey)
 
 	router.Run(rAddr)
 }
