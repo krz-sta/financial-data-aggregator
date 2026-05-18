@@ -3,6 +3,7 @@ package auth
 import (
 	"errors"
 	"financial-data-aggregator-backend/internal/models"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -98,10 +99,11 @@ func (h *Handler) Login(c *gin.Context) {
 		"iat": time.Now().Unix(),
 	}
 
-	token := jwt.NewWithClaims(jwt.SigningMethodES256, claims)
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(h.JWTKey))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		fmt.Println(err.Error())
 		return
 	}
 
