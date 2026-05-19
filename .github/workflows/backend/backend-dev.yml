@@ -1,18 +1,12 @@
-name: Backend CI 
+name: Backend Dev CI
 
 on:
-  push:
-    # Na main: zawsze i wszystko
-    branches:
-      - main
-      
-  # Na dev: tylko jezeli zmienił sie backend
   pull_request:
     branches:
       - dev
     paths:
-      - 'backend/**' 
-      
+      - 'backend/**'
+
 jobs:
   test:
     runs-on: ubuntu-latest
