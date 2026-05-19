@@ -9,6 +9,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
+	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
 )
@@ -52,6 +53,7 @@ func (h *Handler) Register(c *gin.Context) {
 	}
 
 	newUser := models.User{
+		ID:           uuid.New(),
 		Email:        input.Email,
 		PasswordHash: string(passwordHash),
 	}
