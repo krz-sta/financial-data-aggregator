@@ -44,6 +44,11 @@ func testRegisterValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
 			expectedStatus: http.StatusCreated,
 		},
+		{
+			name:           "Ponowna poprawna rejestracja",
+			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
+			expectedStatus: http.StatusConflict,
+		},
 	}
 
 	gin.SetMode(gin.TestMode)
@@ -92,7 +97,17 @@ func testLoginValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Poprawna logowanie",
+			name:           "Niestniejący mail",
+			payload:        `{"email":"testbad@bad.com", "password":"supersecret123"}`,
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name:           "Złe hasło",
+			payload:        `{"email":"test@test.com", "password":"supersecret321bad"}`,
+			expectedStatus: http.StatusUnauthorized,
+		},
+		{
+			name:           "Poprawne logowanie",
 			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
 			expectedStatus: http.StatusOK,
 		},
