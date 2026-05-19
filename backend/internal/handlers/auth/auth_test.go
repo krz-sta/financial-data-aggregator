@@ -20,32 +20,32 @@ func testRegisterValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 		expectedStatus int
 	}{
 		{
-			name:           "Za krótkie hasło",
+			name:           "Password too short",
 			payload:        `{"email":"test@test.com", "password":"short"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Zły format email",
+			name:           "Wrong email format",
 			payload:        `{"email":"zly-email", "password":"supersecret123"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Brak adresu email",
+			name:           "No email",
 			payload:        `{"password":"supersecret123"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Brak hasła",
+			name:           "No password",
 			payload:        `{"email":"test@test.com"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Poprawna rejestracja",
+			name:           "Correct registration",
 			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
 			expectedStatus: http.StatusCreated,
 		},
 		{
-			name:           "Ponowna poprawna rejestracja",
+			name:           "Correct registration (user already exists)",
 			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
 			expectedStatus: http.StatusConflict,
 		},
@@ -64,7 +64,7 @@ func testRegisterValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 			h.Register(c)
 
 			if w.Code != tt.expectedStatus {
-				t.Errorf("%s: oczekiwano statusu %d, otrzymano %d", tt.name, tt.expectedStatus, w.Code)
+				t.Errorf("%s: expected status %d, recieved %d", tt.name, tt.expectedStatus, w.Code)
 			}
 		})
 	}
@@ -77,37 +77,37 @@ func testLoginValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 		expectedStatus int
 	}{
 		{
-			name:           "Za krótkie hasło",
+			name:           "Password too short",
 			payload:        `{"email":"test@test.com", "password":"short"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Zły format email",
+			name:           "Wrong email format",
 			payload:        `{"email":"zly-email", "password":"supersecret123"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Brak adresu email",
+			name:           "No email",
 			payload:        `{"password":"supersecret123"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Brak hasła",
+			name:           "No password",
 			payload:        `{"email":"test@test.com"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
-			name:           "Niestniejący mail",
+			name:           "Unregistered user (mail)",
 			payload:        `{"email":"testbad@bad.com", "password":"supersecret123"}`,
 			expectedStatus: http.StatusUnauthorized,
 		},
 		{
-			name:           "Złe hasło",
+			name:           "Wrong password",
 			payload:        `{"email":"test@test.com", "password":"supersecret321bad"}`,
 			expectedStatus: http.StatusUnauthorized,
 		},
 		{
-			name:           "Poprawne logowanie",
+			name:           "Correct login",
 			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
 			expectedStatus: http.StatusOK,
 		},
@@ -126,7 +126,7 @@ func testLoginValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 			h.Login(c)
 
 			if w.Code != tt.expectedStatus {
-				t.Errorf("%s: oczekiwano statusu %d, otrzymano %d", tt.name, tt.expectedStatus, w.Code)
+				t.Errorf("%s: expected status %d, recieved %d", tt.name, tt.expectedStatus, w.Code)
 			}
 		})
 	}
@@ -148,11 +148,11 @@ func TestAuth(t *testing.T) {
 
 	jwt_secret := "test_secret_key"
 
-	t.Run("Rejestracja", func(t *testing.T) {
+	t.Run("Registration", func(t *testing.T) {
 		testRegisterValidation(t, db, jwt_secret)
 	})
 
-	t.Run("Logowanie", func(t *testing.T) {
+	t.Run("Login", func(t *testing.T) {
 		testLoginValidation(t, db, jwt_secret)
 	})
 }
