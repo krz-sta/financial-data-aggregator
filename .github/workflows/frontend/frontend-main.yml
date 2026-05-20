@@ -1,9 +1,0 @@
-name: Frontend Production CI
-
-on:
-  pull_request:
-    branches:
-      - main
-  push:
-    branches:
-      - main
