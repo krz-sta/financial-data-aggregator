@@ -4,6 +4,7 @@ on:
   pull_request:
     branches:
       - main
+
   push:
     branches:
       - main
@@ -11,5 +12,11 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "TODO: Frontend main tests"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run frontend production tests
+        run: |
+          echo "TODO: Frontend main tests"

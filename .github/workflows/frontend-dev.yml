@@ -5,10 +5,16 @@ on:
     branches:
       - dev
     paths:
-      - 'frontend/**'
+      - "frontend/**"
 
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
-      - run: echo "TODO: Frontend dev tests"
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run frontend dev tests
+        run: |
+          echo "TODO: Frontend dev tests"
