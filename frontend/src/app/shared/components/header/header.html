@@ -2,30 +2,41 @@
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between">
 
-            <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 my-2">
                 <div class="w-6 h-6 border border-white flex items-center justify-center">
                     <svg lucideTrendingUp class="w-3.5 h-3.5 text-white"></svg>
                 </div>
                 <span class="text-sm font-mono text-white tracking-widest">fin<span class="text-zinc-400">.</span>data</span>
             </div>
 
-            <div class="relative flex-1 w-full max-w-md mx-8">
-                <svg lucideSearch class="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-zinc-600"></svg>
-                <input
-                    type="text"
-                    placeholder="Search markets"
-                    value=""
-                    class="w-full pl-9 pr-3 py-2 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
-                />
-            </div>
+            @if (showAuthButtons()) {
+                <div class="relative max-w-md mx-8">
+                    <svg lucideSearch class="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-zinc-600"></svg>
+                    <input
+                        type="text"
+                        placeholder="Search markets"
+                        value=""
+                        class="w-full pl-9 pr-3 py-2 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
+                    />
+                </div>
+            }
 
-            <div class="flex items-center gap-2">
-                <button class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest">
-                    LOG IN
-                </button>
-                <button class="px-4 py-2 text-xs font-mono bg-white text-black hover:bg-zinc-100 transition-colors tracking-widest">
-                    SIGN UP
-                </button>
+            <div>
+                @if (showAuthButtons()) {
+                    <div class="flex items-center gap-2">
+                        <button routerLink="/auth" [queryParams]="{ mode: 'login'}" class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest">
+                            LOG IN
+                        </button>
+                        <button routerLink="/auth" [queryParams]="{ mode: 'signup'}" class="px-4 py-2 text-xs font-mono bg-white text-black hover:bg-zinc-100 transition-colors tracking-widest">
+                            SIGN UP
+                        </button>
+                    </div>
+                } @else {
+                    <button routerLink="/" class="group px-4 py-2 flex items-center justify-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest">
+                        <svg lucideArrowLeft class="w-4 h-4 mb-[2px] group-hover:translate-x-[-5px] transition-transform"></svg>
+                        <p class="leading-none">GO BACK</p>
+                    </button>
+                }
             </div>
         </div>
     </div>
