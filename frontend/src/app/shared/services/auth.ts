@@ -11,7 +11,7 @@ export class AuthService {
   private apiUrl = 'http://localhost:8080/api';
 
   login(credentials: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/login`, credentials).pipe(
+    return this.http.post(`${this.apiUrl}/auth/login`, credentials).pipe(
       tap((res: any) => {
         if (res.token) {
           localStorage.setItem('auth_token', res.token);
@@ -26,7 +26,7 @@ export class AuthService {
       displayName: formData.name, 
       password: formData.password
     };
-    return this.http.post(`${this.apiUrl}/register`, payload);
+    return this.http.post(`${this.apiUrl}/auth/register`, payload);
   }
 
   logout() {
