@@ -19,7 +19,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./backend:/app
+      - ./backend:/app:z
     environment:
       - DB_HOST=db
       - DB_USER=devuser
@@ -39,7 +39,7 @@ services:
     ports:
       - "4200:4200"
     volumes:
-      - ./frontend:/app
+      - ./frontend:/app:z
       - /app/node_modules
     depends_on:
       - backend
