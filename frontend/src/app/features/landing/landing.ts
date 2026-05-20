@@ -1,12 +1,13 @@
 import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Header } from '../../shared/components/header/header';
-import { LucideActivity, LucideArrowRight, LucideDatabase, LucideShield, LucideWifi } from '@lucide/angular';
+import { LucideActivity, LucideArrowRight, LucideDatabase, LucideShield, LucideWifi, LucideZap } from '@lucide/angular';
+import { Footer } from '../../shared/components/footer/footer';
 
 
 @Component({
   selector: 'app-landing',
-  imports: [RouterLink, Header, LucideActivity, LucideArrowRight, LucideWifi, LucideDatabase, LucideShield],
+  imports: [RouterLink, Header, Footer, LucideActivity, LucideArrowRight, LucideWifi, LucideDatabase, LucideZap, LucideShield],
   templateUrl: './landing.html',
   styleUrl: './landing.scss',
 })
