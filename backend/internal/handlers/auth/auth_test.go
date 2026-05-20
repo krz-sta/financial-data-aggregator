@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"financial-data-aggregator-backend/internal/models"
+	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -21,32 +22,42 @@ func testRegisterValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 	}{
 		{
 			name:           "Password too short",
-			payload:        `{"email":"test@test.com", "password":"short"}`,
+			payload:        `{"email":"test@test.com", "displayName":"testUser", "password":"short"}`,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "DisplayName too short",
+			payload:        `{"email":"test@test.com", "displayName":"tes", "password":"short"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name:           "Wrong email format",
-			payload:        `{"email":"zly-email", "password":"supersecret123"}`,
+			payload:        `{"email":"zly-email", "displayName":"testUser", "password":"supersecret123"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name:           "No email",
-			payload:        `{"password":"supersecret123"}`,
+			payload:        `{displayName":"testUser", "password":"supersecret123"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name:           "No password",
-			payload:        `{"email":"test@test.com"}`,
+			payload:        `{"email":"test@test.com", "displayName":"testUser"}`,
+			expectedStatus: http.StatusBadRequest,
+		},
+		{
+			name:           "No DisplayName",
+			payload:        `{"email":"test@test.com", "password":"short"}`,
 			expectedStatus: http.StatusBadRequest,
 		},
 		{
 			name:           "Correct registration",
-			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
+			payload:        `{"email":"test@test.com", "displayName":"testUser", "password":"supersecret123"}`,
 			expectedStatus: http.StatusCreated,
 		},
 		{
 			name:           "Correct registration (user already exists)",
-			payload:        `{"email":"test@test.com", "password":"supersecret123"}`,
+			payload:        `{"email":"test@test.com", "displayName":"testUser", "password":"supersecret123"}`,
 			expectedStatus: http.StatusConflict,
 		},
 	}
@@ -121,6 +132,7 @@ func testLoginValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
+			fmt.Println(tt.payload)
 			c.Request, _ = http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(tt.payload)))
 
 			h.Login(c)

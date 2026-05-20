@@ -13,6 +13,17 @@ import (
 	"gorm.io/gorm"
 )
 
+type registerInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Name     string `json:"displayName" binding:"required,min=4"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
+type loginInput struct {
+	Email    string `json:"email" binding:"required,email"`
+	Password string `json:"password" binding:"required,min=8"`
+}
+
 type Handler struct {
 	DB     *gorm.DB
 	JWTKey string
@@ -26,7 +37,7 @@ func NewHandler(db *gorm.DB, jwtKey string) *Handler {
 }
 
 func (h *Handler) Register(c *gin.Context) {
-	var input models.AuthInput
+	var input registerInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -54,6 +65,7 @@ func (h *Handler) Register(c *gin.Context) {
 	newUser := models.User{
 		ID:           uuid.New(),
 		Email:        input.Email,
+		DisplayName:  input.Name,
 		PasswordHash: string(passwordHash),
 	}
 
@@ -67,7 +79,7 @@ func (h *Handler) Register(c *gin.Context) {
 }
 
 func (h *Handler) Login(c *gin.Context) {
-	var input models.AuthInput
+	var input loginInput
 
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
