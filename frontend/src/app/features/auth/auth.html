@@ -64,9 +64,13 @@
           </div>
         </div>
 
-        <button type="submit"
-          class="!mt-8 w-full py-3 bg-white text-black hover:bg-zinc-100 transition-colors text-xs font-mono tracking-widest uppercase font-bold">
-          {{ authMode() === 'login' ? 'LOGIN' : 'CREATE ACCOUNT' }}
+        <button type="submit" [disabled]="isLoading()" 
+          class="w-full py-3 mt-4 bg-white text-black hover:bg-zinc-100 transition-colors text-xs tracking-widest uppercase font-bold disabled:opacity-50 disabled:cursor-wait">
+          @if (isLoading()) {
+            EXECUTING...
+          } @else {
+            {{ authMode() === 'login' ? 'LOGIN' : 'CREATE ACCOUNT' }}
+          }
         </button>
 
       </form>
