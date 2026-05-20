@@ -19,11 +19,7 @@ type User struct {
 	ID           uuid.UUID       `gorm:"type:uuid;not null;primaryKey" json:"id"`
 	Email        string          `gorm:"type:varchar(255);not null" json:"email"`
 	PasswordHash string          `gorm:"type:varchar(255);not null" json:"-"`
+	DisplayName  string          `gorm:"type:varchar(255); not null" json:"displayName"`
 	CreatedAt    time.Time       `gorm:"type:timestamp" json:"createdAt"`
 	Portfolio    []PortfolioItem `gorm:"foreignKey:UserID" json:"portfolio,omitempty"`
-}
-
-type AuthInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
 }
