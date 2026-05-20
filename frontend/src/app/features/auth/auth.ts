@@ -5,6 +5,8 @@ import { map } from 'rxjs';
 import { Header } from '../../shared/components/header/header';
 import { Footer } from '../../shared/components/footer/footer';
 import { FormsModule } from '@angular/forms';
+import { AuthService } from '../../shared/services/auth'
+import { email } from '@angular/forms/signals';
 
 @Component({
   selector: 'app-auth',
@@ -16,6 +18,7 @@ import { FormsModule } from '@angular/forms';
 export class Auth {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private authService = inject(AuthService)
 
   authMode = toSignal(
     this.route.queryParams.pipe(
@@ -30,6 +33,9 @@ export class Auth {
     password: ''
   });
 
+  isLoading = signal(false);
+  errorMessage = signal<string | null>(null);
+
   setMode(mode: 'login' | 'signup') {
     this.router.navigate([], {
       relativeTo: this.route,
@@ -40,12 +46,38 @@ export class Auth {
 
   handleSubmit(event: Event) {
     event.preventDefault();
+    this.isLoading.set(true);
+    this.errorMessage.set(null);
     
     if (this.authMode() === 'login') {
-      console.log('Log in:', this.formData().email, this.formData().password);
-      // todo: auth service
+      
+      this.authService.login({
+        email: this.formData().email,
+        password: this.formData().password
+      }).subscribe({
+        next: (res) => {
+          this.isLoading.set(false);
+          this.router.navigate(['/']);
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err?.error || 'ERROR.');
+        }
+      });
+
     } else {
-      console.log('Sign up:', this.formData());
+
+      this.authService.register(this.formData()).subscribe({
+        next: (res) => {
+          this.isLoading.set(false);
+          this.setMode('login');
+          this.formData.set({ name: '', email: '', password: '' });
+        },
+        error: (err) => {
+          this.isLoading.set(false);
+          this.errorMessage.set(err?.error || 'ERROR.')
+        }
+      });
     }
   }
 }
