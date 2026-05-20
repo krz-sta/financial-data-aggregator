@@ -8,8 +8,8 @@ on:
     branches:
       - main
 
-jobs: 
+jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - run: echo "TODO: Frontend tests"
+      - run: echo "TODO: Frontend main tests"
