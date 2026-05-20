@@ -57,7 +57,7 @@ export class Auth {
       }).subscribe({
         next: (res) => {
           this.isLoading.set(false);
-          this.router.navigate(['/']);
+          this.router.navigate(['/home']);
         },
         error: (err) => {
           this.isLoading.set(false);

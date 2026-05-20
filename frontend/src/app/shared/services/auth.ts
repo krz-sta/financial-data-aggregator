@@ -33,10 +33,10 @@ export class AuthService {
 
   logout() {
     localStorage.removeItem('auth_token');
+    this.isLoggedIn.set(false);
   }
 
   getToken() {
     return localStorage.getItem('auth_token');
-    this.isLoggedIn.set(false);
   }
 }
