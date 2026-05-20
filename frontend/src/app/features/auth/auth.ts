@@ -4,11 +4,12 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { map } from 'rxjs';
 import { Header } from '../../shared/components/header/header';
 import { Footer } from '../../shared/components/footer/footer';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [RouterLink, Header, Footer],
+  imports: [RouterLink, Header, Footer, FormsModule],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
 })
