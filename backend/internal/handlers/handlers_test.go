@@ -29,6 +29,6 @@ func TestSetupRouter(t *testing.T) {
 	}
 
 	if !foundRegister {
-		t.Errorf("Router did not register routes")
+		t.Errorf("Router did not register route")
 	}
 }
