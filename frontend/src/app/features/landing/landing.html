@@ -1,51 +1,51 @@
-<div class="bg-black min-h-screen">
-    <app-header />
-    <section class="relative py-24 px-6 border-b border-zinc-800">
-        <div class="absolute inset-0 bg-[linear-gradient(to_right,#18181b_1px,transparent_1px),linear-gradient(to_bottom,#18181b_1px,transparent_1px)] [background-size:4rem_4rem]"></div>
+<div class="bg-transparent min-h-screen flex flex-col overflow-hidden">
+    <main class="flex-1">
+        <app-header />
+        <section class="relative py-24 px-6 border-b border-zinc-800">
+            <div class="relative max-w-4xl mx-auto text-center">
+                <div class="inline-flex bg-black items-center gap-2 px-3 py-1 border border-zinc-800 mb-8">
+                    <svg lucideActivity class="w-3 h-3 text-white"></svg>
+                    <span class="text-xd font-mono text-zinc-400 tracking-wider">REAL-TIME MARKET DATA</span>
+                </div>
 
-        <div class="relative max-w-4xl mx-auto text-center">
-            <div class="inline-flex items-center gap-2 px-3 py-1 border border-zinc-800 mb-8">
-                <svg lucideActivity class="w-3 h-3 text-white"></svg>
-                <span class="text-xd font-mono text-zinc-400 tracking-wider">REAL-TIME MARKET DATA</span>
+                <h1 class="text-5xl md:text-7xl font-mono text-white mb-6 tracking-tight">
+                    MONITOR<br />MARKETS
+                </h1>
+
+                <p class="text-lg text-zinc-500 mb-12 max-w-2xl mx-auto font-mono leading-relaxed">
+                    Real-time cryptocurrency tracking via Binance WebSocket and Polish currency exchange rates from NBP.
+                    Minimal. Fast. Precise.
+                </p>
+
+                <button class="inline-flex items-center gap-3 px-6 py-3 bg-white text-black hover:bg-zinc-100 transition-colors group">
+                    <span class="text-xs font-mono tracking-widest">START MONITORING</span>
+                    <svg lucideArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform"></svg>
+                </button>
             </div>
+        </section>
 
-            <h1 class="text-5xl md:text-7xl font-mono text-white mb-6 tracking-tight">
-                MONITOR<br />MARKETS
-            </h1>
+        <section class="py-24 px-6 bg-black border-b border-zinc-800">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-800">
 
-            <p class="text-lg text-zinc-500 mb-12 max-w-2xl mx-auto font-mono leading-relaxed">
-                Real-time cryptocurrency tracking via Binance WebSocker and Polish currency exchange rates from NBP.
-                Minimal. Fast. Precise.
-            </p>
+                    @for (feature of features; track feature.title) {
+                        <div class="bg-black p-8">
+                            @if (feature.icon === 'wifi') { <i data-lucide="wifi"><svg lucideWifi class="w-5 h-5 text-white mb-4"></svg></i> }
+                            @if (feature.icon === 'database') { <svg lucideDatabase class="w-5 h-5 text-white mb-4"></svg> }
+                            @if (feature.icon === 'zap') { <svg lucideZap class="w-5 h-5 text-white mb-4"></svg> }
+                            @if (feature.icon === 'shield') { <svg lucideShield class="w-5 h-5 text-white mb-4"></svg> }
 
-            <button class="inline-flex items-center gap-3 px-6 py-3 bg-white text-black hover:bg-zinc-100 transition-colors group">
-                <span class="text-xs font-mono tracking-widest">START MONITORING</span>
-                <svg lucideArrowRight class="w-4 h-4 group-hover:translate-x-1 transition-transform"></svg>
-            </button>
-        </div>
-    </section>
-
-    <section class="py-24 px-6 border-b border-zinc-800">
-        <div class="max-w-7xl mx-auto">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-800">
-
-                @for (feature of features; track feature.title) {
-                    <div class="bg-black p-8">
-                        @if (feature.icon === 'wifi') { <i data-lucide="wifi"><svg lucideWifi class="w-5 h-5 text-white mb-4"></svg></i> }
-                        @if (feature.icon === 'database') { <svg lucideDatabase class="w-5 h-5 text-white mb-4"></svg> }
-                        @if (feature.icon === 'zap') { <svg lucideZap class="w-5 h-5 text-white mb-4"></svg> }
-                        @if (feature.icon === 'shield') { <svg lucideShield class="w-5 h-5 text-white mb-4"></svg> }
-
-                        <h3 class="text-xs font-mono text-white tracking-widest mb-3">
-                            {{ feature.title }}
-                        </h3>
-                        <p class="text-sm text-zinc-500 leading-relaxed">
-                            {{ feature.description }}
-                        </p>
-                    </div>
-                }
+                            <h3 class="text-xs font-mono text-white tracking-widest mb-3">
+                                {{ feature.title }}
+                            </h3>
+                            <p class="text-sm text-zinc-500 leading-relaxed">
+                                {{ feature.description }}
+                            </p>
+                        </div>
+                    }
+                </div>
             </div>
-        </div>
-    </section>
+        </section>
+    </main>
     <app-footer />
 </div>
