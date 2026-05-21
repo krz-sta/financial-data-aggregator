@@ -12,6 +12,11 @@ export const routes: Routes = [
     data: { showAuthButtons: false }
   },
   {
+    path: 'home',
+    loadComponent: () => import('./features/home/home').then(m => m.Home),
+    data: { showAuthButtons: false }
+  },
+  {
     path: '**',
     redirectTo: ''
   }
