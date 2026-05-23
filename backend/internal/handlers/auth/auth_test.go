@@ -3,7 +3,6 @@ package auth
 import (
 	"bytes"
 	"financial-data-aggregator-backend/internal/models"
-	"fmt"
 	"log"
 	"net/http"
 	"net/http/httptest"
@@ -132,7 +131,6 @@ func testLoginValidation(t *testing.T, db *gorm.DB, jwtKey string) {
 			w := httptest.NewRecorder()
 			c, _ := gin.CreateTestContext(w)
 
-			fmt.Println(tt.payload)
 			c.Request, _ = http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(tt.payload)))
 
 			h.Login(c)
