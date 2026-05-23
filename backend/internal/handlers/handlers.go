@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"financial-data-aggregator-backend/internal/handlers/auth"
+	"financial-data-aggregator-backend/internal/middleware"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -27,6 +28,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 		{
 			authGroup.POST("/register", authHandler.Register)
 			authGroup.POST("/login", authHandler.Login)
+		}
+
+		protected := api.Group("/protected").Use(middleware.AuthMiddleware(jwtKey))
+		{
+
 		}
 	}
 }
