@@ -18,13 +18,13 @@ func NewHandler(db *gorm.DB) *Handler {
 	}
 }
 
-func (h *Handler) GetProfile(c *gin.Context) {
-	userID, exists := c.Get("userID")
+func (h *Handler) GetProfile(ctx *gin.Context) {
+	userID, exists := ctx.Get("userID")
 	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "user doesn't exists"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "user doesn't exists"})
 		return
 	}
 
 	idStr := fmt.Sprint(userID)
-	c.JSON(http.StatusOK, gin.H{"data": "hello user, " + idStr})
+	ctx.JSON(http.StatusOK, gin.H{"data": "hello user, " + idStr})
 }
