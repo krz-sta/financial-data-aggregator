@@ -24,6 +24,12 @@ type loginInput struct {
 	Password string `json:"password" binding:"required,min=8"`
 }
 
+type userResponse struct {
+	ID          uuid.UUID `json:"id"`
+	Email       string    `json:"email"`
+	DisplayName string    `json:"displayName"`
+}
+
 type Handler struct {
 	DB     *gorm.DB
 	JWTKey string
@@ -75,7 +81,11 @@ func (h *Handler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": newUser})
+	c.JSON(http.StatusCreated, gin.H{"data": userResponse{
+		ID:          newUser.ID,
+		Email:       newUser.Email,
+		DisplayName: newUser.DisplayName,
+	}})
 }
 
 func (h *Handler) Login(c *gin.Context) {
