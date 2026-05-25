@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"financial-data-aggregator-backend/internal/handlers/auth"
+	"financial-data-aggregator-backend/internal/handlers/user"
 	"financial-data-aggregator-backend/internal/middleware"
 	"time"
 
@@ -21,6 +22,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 	}))
 
 	authHandler := auth.NewHandler(db, jwtKey)
+	userHandler := user.NewHandler(db)
 
 	api := router.Group("/api")
 	{
@@ -32,7 +34,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 
 		protected := api.Group("/protected").Use(middleware.AuthMiddleware(jwtKey))
 		{
-
+			protected.POST("/profile", userHandler.GetProfile)
 		}
 	}
 }
