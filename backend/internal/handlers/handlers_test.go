@@ -26,6 +26,14 @@ func TestSetupRouter(t *testing.T) {
 		if r.Path == "/api/auth/login" && r.Method == "POST" {
 			foundRegister = true
 		}
+
+		if r.Path == "/api/protected/profile" && r.Method == "POST" {
+			foundRegister = true
+		}
+
+		if r.Path == "/api/health/db" && r.Method == "GET" {
+			foundRegister = true
+		}
 	}
 
 	if !foundRegister {
