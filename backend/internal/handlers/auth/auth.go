@@ -42,29 +42,29 @@ func NewHandler(db *gorm.DB, jwtKey string) *Handler {
 	}
 }
 
-func (h *Handler) Register(c *gin.Context) {
+func (h *Handler) Register(ctx *gin.Context) {
 	var input registerInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
 	var count int64
 	err := h.DB.Model(&models.User{}).Where("email = ?", input.Email).Count(&count).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	if count > 0 {
-		c.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
+		ctx.JSON(http.StatusConflict, gin.H{"error": "email already registered"})
 		return
 	}
 
 	passwordHash, err := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -77,22 +77,22 @@ func (h *Handler) Register(c *gin.Context) {
 
 	err = h.DB.Create(&newUser).Error
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"data": userResponse{
+	ctx.JSON(http.StatusCreated, gin.H{"data": userResponse{
 		ID:          newUser.ID,
 		Email:       newUser.Email,
 		DisplayName: newUser.DisplayName,
 	}})
 }
 
-func (h *Handler) Login(c *gin.Context) {
+func (h *Handler) Login(ctx *gin.Context) {
 	var input loginInput
 
-	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+	if err := ctx.ShouldBindJSON(&input); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -100,16 +100,16 @@ func (h *Handler) Login(c *gin.Context) {
 	err := h.DB.Model(&models.User{}).Where("email = ?", input.Email).First(&tempUsr).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 			return
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
 	err = bcrypt.CompareHashAndPassword([]byte(tempUsr.PasswordHash), []byte(input.Password))
 	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid email or password"})
 		return
 	}
 
@@ -125,9 +125,9 @@ func (h *Handler) Login(c *gin.Context) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 	tokenString, err := token.SignedString([]byte(h.JWTKey))
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "failed to generate token"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"token": tokenString})
+	ctx.JSON(http.StatusOK, gin.H{"token": tokenString})
 }
