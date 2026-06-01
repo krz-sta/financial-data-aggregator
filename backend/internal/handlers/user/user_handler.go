@@ -29,7 +29,7 @@ func (h *Handler) GetProfile(ctx *gin.Context) {
 
 	user, err := h.userServvice.GetUserProfile(idStr)
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{"error": "useer not found"})
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "user not found"})
 	}
 
 	ctx.JSON(http.StatusOK, user)
