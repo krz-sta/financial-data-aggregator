@@ -5,6 +5,8 @@ import (
 	"financial-data-aggregator-backend/internal/handlers/health"
 	"financial-data-aggregator-backend/internal/handlers/user"
 	"financial-data-aggregator-backend/internal/middleware"
+	"financial-data-aggregator-backend/internal/repository"
+	"financial-data-aggregator-backend/internal/service"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -22,8 +24,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	authHandler := auth.NewHandler(db, jwtKey)
-	userHandler := user.NewHandler(db)
+	userRepo := repository.NewUserRepository(db)
+
+	authService := service.NewAuthService(userRepo, jwtKey)
+	userService := service.NewUserService(userRepo)
+
+	authHandler := auth.NewHandler(authService)
+	userHandler := user.NewHandler(userService)
 	heakthHandler := health.NewHandler(db)
 
 	api := router.Group("/api")
