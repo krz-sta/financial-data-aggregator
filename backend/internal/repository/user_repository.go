@@ -39,6 +39,6 @@ func (r *userRepository) EmailExists(email string) (bool, error) {
 
 func (r *userRepository) FindById(id string) (*models.User, error) {
 	var user models.User
-	err := r.db.Where("id = ?, id").First(&user).Error
+	err := r.db.Where("id = ?", id).First(&user).Error
 	return &user, err
 }
