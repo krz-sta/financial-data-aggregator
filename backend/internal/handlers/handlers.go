@@ -3,8 +3,11 @@ package handlers
 import (
 	"financial-data-aggregator-backend/internal/handlers/auth"
 	"financial-data-aggregator-backend/internal/handlers/health"
+	"financial-data-aggregator-backend/internal/handlers/portfolio"
 	"financial-data-aggregator-backend/internal/handlers/user"
 	"financial-data-aggregator-backend/internal/middleware"
+	"financial-data-aggregator-backend/internal/repository"
+	"financial-data-aggregator-backend/internal/service"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -22,9 +25,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 		MaxAge:           12 * time.Hour,
 	}))
 
-	authHandler := auth.NewHandler(db, jwtKey)
-	userHandler := user.NewHandler(db)
-	heakthHandler := health.NewHandler(db)
+	userRepo := repository.NewUserRepository(db)
+	portfolioRepo := repository.NewPortfolioRepository(db)
+
+	authService := service.NewAuthService(userRepo, jwtKey)
+	userService := service.NewUserService(userRepo)
+	portfolioService := service.NewPortfolioService(portfolioRepo)
+
+	authHandler := auth.NewHandler(authService)
+	userHandler := user.NewHandler(userService)
+	healthHandler := health.NewHandler(db)
+	portfolioHandler := portfolio.NewHandler(portfolioService)
 
 	api := router.Group("/api")
 	{
@@ -37,11 +48,17 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 		protected := api.Group("/protected").Use(middleware.AuthMiddleware(jwtKey))
 		{
 			protected.POST("/profile", userHandler.GetProfile)
+
+			portfolioGroup := api.Group("/portfolio")
+			{
+				portfolioGroup.POST("", portfolioHandler.AddPortfolioItem)
+				portfolioGroup.DELETE("/:id", portfolioHandler.DeletePortfolioItem)
+			}
 		}
 
 		healthGroup := api.Group("/health")
 		{
-			healthGroup.GET("/db", heakthHandler.DBHealth)
+			healthGroup.GET("/db", healthHandler.DBHealth)
 		}
 	}
 }
