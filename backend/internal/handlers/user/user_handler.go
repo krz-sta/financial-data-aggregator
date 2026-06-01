@@ -1,30 +1,36 @@
 package user
 
 import (
+	"financial-data-aggregator-backend/internal/service"
 	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 )
 
 type Handler struct {
-	DB *gorm.DB
+	userServvice service.UserService
 }
 
-func NewHandler(db *gorm.DB) *Handler {
+func NewHandler(userServvice service.UserService) *Handler {
 	return &Handler{
-		DB: db,
+		userServvice: userServvice,
 	}
 }
 
 func (h *Handler) GetProfile(ctx *gin.Context) {
 	userID, exists := ctx.Get("userID")
 	if !exists {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "user doesn't exists"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "unauthorized"})
 		return
 	}
 
 	idStr := fmt.Sprint(userID)
-	ctx.JSON(http.StatusOK, gin.H{"data": "hello user, " + idStr})
+
+	user, err := h.userServvice.GetUserProfile(idStr)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{"error": "useer not found"})
+	}
+
+	ctx.JSON(http.StatusOK, user)
 }
