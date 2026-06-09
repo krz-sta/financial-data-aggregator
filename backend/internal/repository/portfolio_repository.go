@@ -32,7 +32,7 @@ func (r *portfolioRepository) DeleteItem(userUUID, itemUUID uuid.UUID) error {
 	}
 
 	if result.RowsAffected == 0 {
-		return errors.New("couln't find the item")
+		return errors.New("couldn't find the item")
 	}
 
 	return nil
