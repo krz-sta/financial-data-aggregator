@@ -25,4 +25,7 @@ jobs:
         run: go mod download
 
       - name: Run Tests
-        run: go test -v ./... # Rekurencyjnie szuka wszystkich plików kończących się na _test.go
+        run: go test -v -coverprofile=coverage.out ./... # Rekurencyjnie szuka wszystkich plików kończących się na _test.go
+
+      - name: Coverage report
+        run: go tool cover -func=coverage.out
