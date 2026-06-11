@@ -28,4 +28,4 @@ jobs:
         run: go test -v -coverprofile=coverage.out ./... # Rekurencyjnie szuka wszystkich plików kończących się na _test.go
 
       - name: Coverage report
-        run: go go tool cover -func=coverage.out
+        run: go tool cover -func=coverage.out
