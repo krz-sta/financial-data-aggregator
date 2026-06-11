@@ -9,7 +9,7 @@ import (
 )
 
 func TestPortfolioRepository(t *testing.T) {
-	db, cleanup := testDB(t) // Wykorzystuje Twoje środowisko z Testcontainers
+	db, cleanup := testDB(t)
 	defer cleanup()
 
 	repo := NewPortfolioRepository(db)
