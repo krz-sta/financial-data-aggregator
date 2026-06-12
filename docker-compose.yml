@@ -9,6 +9,13 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+  
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
 
   backend:
     build:
@@ -27,8 +34,12 @@ services:
       - ROUTER_PORT=8080
       - ROUTER_HOST=0.0.0.0
       - JWT_SECRET=jwt-dev-key-123
+      - REDIS_HOST=redis    
+      - REDIS_PORT=6379     
+      - REDIS_PASSWORD=
     depends_on:
       - db
+      - redis
 
   frontend:
     build:
@@ -44,3 +55,4 @@ services:
 
 volumes:
   pgdata: 
+  redis_data:

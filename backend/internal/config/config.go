@@ -8,6 +8,7 @@ import (
 type Config struct {
 	DB     *DBconfig
 	Router *RouterConfig
+	Redis  *RedisConfig
 	JWTKey string
 }
 
@@ -24,6 +25,12 @@ type RouterConfig struct {
 	Port string
 }
 
+type RedisConfig struct {
+	Host     string
+	Port     string
+	Password string
+}
+
 func (db *DBconfig) GetDsn() string {
 	return fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
 		db.Host, db.User, db.Password, db.Name, db.Port)
@@ -31,6 +38,10 @@ func (db *DBconfig) GetDsn() string {
 
 func (r *RouterConfig) GetRouterConfig() string {
 	return fmt.Sprintf("%s:%s", r.Host, r.Port)
+}
+
+func (red *RedisConfig) GetRedisConfig() string {
+	return fmt.Sprintf("%s:%s", red.Host, red.Port)
 }
 
 func LoadConfig() *Config {
@@ -47,9 +58,16 @@ func LoadConfig() *Config {
 		Port: os.Getenv("ROUTER_PORT"),
 	}
 
+	redisCfg := &RedisConfig{
+		Host:     os.Getenv("REDIS_HOST"),
+		Port:     os.Getenv("REDIS_PORT"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+	}
+
 	return &Config{
 		DB:     dbCfg,
 		Router: routerCfg,
+		Redis:  redisCfg,
 		JWTKey: os.Getenv("JWT_SECRET"),
 	}
 }
