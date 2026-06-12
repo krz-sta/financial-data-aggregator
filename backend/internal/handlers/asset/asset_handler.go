@@ -19,7 +19,5 @@ func NewHandler(assetService service.AssetService) *Handler {
 
 func (h *Handler) GetAssets(ctx *gin.Context) {
 	assets := h.assetService.GetSupportedAssets()
-
-	// Zwracamy status 200 OK oraz całą tablicę
 	ctx.JSON(http.StatusOK, assets)
 }

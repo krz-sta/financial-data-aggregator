@@ -32,13 +32,13 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 	authService := service.NewAuthService(userRepo, jwtKey)
 	userService := service.NewUserService(userRepo)
 	portfolioService := service.NewPortfolioService(portfolioRepo)
-	assetSErvice := service.NewAssetService()
+	assetService := service.NewAssetService()
 
 	authHandler := auth.NewHandler(authService)
 	userHandler := user.NewHandler(userService)
 	healthHandler := health.NewHandler(db)
 	portfolioHandler := portfolio.NewHandler(portfolioService)
-	assetHandler := asset.NewHandler(assetSErvice)
+	assetHandler := asset.NewHandler(assetService)
 
 	api := router.Group("/api")
 	{
