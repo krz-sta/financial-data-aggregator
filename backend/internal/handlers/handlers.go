@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"financial-data-aggregator-backend/internal/handlers/asset"
 	"financial-data-aggregator-backend/internal/handlers/auth"
 	"financial-data-aggregator-backend/internal/handlers/health"
 	"financial-data-aggregator-backend/internal/handlers/portfolio"
@@ -31,14 +32,18 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 	authService := service.NewAuthService(userRepo, jwtKey)
 	userService := service.NewUserService(userRepo)
 	portfolioService := service.NewPortfolioService(portfolioRepo)
+	assetSErvice := service.NewAssetService()
 
 	authHandler := auth.NewHandler(authService)
 	userHandler := user.NewHandler(userService)
 	healthHandler := health.NewHandler(db)
 	portfolioHandler := portfolio.NewHandler(portfolioService)
+	assetHandler := asset.NewHandler(assetSErvice)
 
 	api := router.Group("/api")
 	{
+		api.GET("/assets", assetHandler.GetAssets)
+
 		authGroup := api.Group("/auth")
 		{
 			authGroup.POST("/register", authHandler.Register)
