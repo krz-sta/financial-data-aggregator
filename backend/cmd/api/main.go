@@ -36,7 +36,7 @@ func main() {
 	defer redis.Close()
 	fmt.Println("Connected to redis")
 
-	handlers.SetupRoutes(router, db, cfg.JWTKey)
+	handlers.SetupRoutes(router, db, cfg.JWTKey, redis)
 
 	router.Run(cfg.Router.GetRouterConfig())
 }
