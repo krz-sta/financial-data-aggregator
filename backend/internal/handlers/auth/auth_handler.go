@@ -1,29 +1,13 @@
 package auth
 
 import (
+	"financial-data-aggregator-backend/internal/models"
 	"financial-data-aggregator-backend/internal/service"
+
 	"net/http"
 
 	"github.com/gin-gonic/gin"
-	"github.com/google/uuid"
 )
-
-type registerInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Name     string `json:"displayName" binding:"required,min=4"`
-	Password string `json:"password" binding:"required,min=8"`
-}
-
-type loginInput struct {
-	Email    string `json:"email" binding:"required,email"`
-	Password string `json:"password" binding:"required,min=8"`
-}
-
-type userResponse struct {
-	ID          uuid.UUID `json:"id"`
-	Email       string    `json:"email"`
-	DisplayName string    `json:"displayName"`
-}
 
 type Handler struct {
 	authService service.AuthService
@@ -36,7 +20,7 @@ func NewHandler(authService service.AuthService) *Handler {
 }
 
 func (h *Handler) Register(ctx *gin.Context) {
-	var input registerInput
+	var input models.RegisterInput
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
@@ -53,7 +37,7 @@ func (h *Handler) Register(ctx *gin.Context) {
 }
 
 func (h *Handler) Login(ctx *gin.Context) {
-	var input loginInput
+	var input models.LoginInput
 
 	if err := ctx.ShouldBindJSON(&input); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

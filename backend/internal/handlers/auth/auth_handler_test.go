@@ -39,7 +39,7 @@ func TestRegister(t *testing.T) {
 	router.POST("/api/auth/register", handler.Register)
 
 	t.Run("Success", func(t *testing.T) {
-		reqBody := registerInput{Email: "test@test.com", Name: "Test User", Password: "password123"}
+		reqBody := models.RegisterInput{Email: "test@test.com", Name: "Test User", Password: "password123"}
 		jsonBody, _ := json.Marshal(reqBody)
 
 		mockUser := &models.User{Email: "test@test.com", DisplayName: "Test User"}
@@ -72,7 +72,7 @@ func TestLogin(t *testing.T) {
 	router.POST("/api/auth/login", handler.Login)
 
 	t.Run("Success", func(t *testing.T) {
-		reqBody := loginInput{Email: "test@test.com", Password: "password123"}
+		reqBody := models.LoginInput{Email: "test@test.com", Password: "password123"}
 		jsonBody, _ := json.Marshal(reqBody)
 
 		mockService.On("Login", "test@test.com", "password123").Return("test_token", nil).Once()
