@@ -72,7 +72,7 @@ func (s *priceService) fetchCrypto(ctx context.Context, assets []models.AssetInf
 	}
 
 	idsParam := strings.Join(cryptoIDS, ",")
-	cgUrl := fmt.Sprintf("https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=usd", idsParam)
+	cgUrl := fmt.Sprintf("https://api.coingecko.com/api/v3/simple/price?ids=%s&vs_currencies=pln", idsParam)
 
 	res, err := http.Get(cgUrl)
 	if err != nil {
@@ -94,7 +94,7 @@ func (s *priceService) fetchCrypto(ctx context.Context, assets []models.AssetInf
 
 	for apiID, rates := range result {
 		symbol := idToSymbol[apiID] // btc -> bitcoin
-		rate := rates["usd"]
+		rate := rates["pln"]
 
 		key := fmt.Sprintf("crypto:%s", symbol) //crypto:btc
 
