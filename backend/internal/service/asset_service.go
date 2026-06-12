@@ -11,9 +11,9 @@ var supportedAssets = []models.AssetInfo{
 	{Symbol: "DOGE", Name: "Dogecoin", Type: "crypto", ApiID: "dogecoin"},
 
 	// fiat (normalne)
-	{Symbol: "USD", Name: "Dolar Amerykański", Type: "fiat", ApiID: "usd"},
-	{Symbol: "EUR", Name: "Euro", Type: "fiat", ApiID: "eur"},
-	{Symbol: "PLN", Name: "Polski Złoty", Type: "fiat", ApiID: "pln"},
+	{Symbol: "USD", Name: "Dolar Amerykański", Type: "fiat", ApiID: ""},
+	{Symbol: "EUR", Name: "Euro", Type: "fiat", ApiID: ""},
+	{Symbol: "GBP", Name: "Funt Szterling", Type: "fiat", ApiID: ""},
 }
 
 type AssetService interface {
