@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 )
 
 func TestSetupRouter(t *testing.T) {
@@ -12,7 +13,9 @@ func TestSetupRouter(t *testing.T) {
 
 	jwt_secret := "test_secret_key"
 
-	SetupRoutes(router, nil, jwt_secret)
+	testRedis := redis.NewClient(&redis.Options{})
+
+	SetupRoutes(router, nil, jwt_secret, testRedis)
 
 	routes := router.Routes()
 

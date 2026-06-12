@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"context"
 	"financial-data-aggregator-backend/internal/handlers/asset"
 	"financial-data-aggregator-backend/internal/handlers/auth"
 	"financial-data-aggregator-backend/internal/handlers/health"
@@ -13,10 +14,11 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/redis/go-redis/v9"
 	"gorm.io/gorm"
 )
 
-func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
+func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Client) {
 	router.Use(cors.New(cors.Config{
 		AllowOrigins:     []string{"http://localhost:4200"},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
@@ -33,6 +35,9 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string) {
 	userService := service.NewUserService(userRepo)
 	portfolioService := service.NewPortfolioService(portfolioRepo)
 	assetService := service.NewAssetService()
+
+	priceService := service.NewPriceService(redis, assetService)
+	priceService.StartWorker(context.Background())
 
 	authHandler := auth.NewHandler(authService)
 	userHandler := user.NewHandler(userService)
