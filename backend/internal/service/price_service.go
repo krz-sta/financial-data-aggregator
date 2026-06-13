@@ -15,6 +15,7 @@ import (
 
 type PriceService interface {
 	StartWorker(ctx context.Context)
+	GetRates(ctx context.Context) map[string]float64
 }
 
 type priceService struct {
@@ -53,6 +54,26 @@ func (s *priceService) StartWorker(ctx context.Context) {
 			}
 		}
 	}()
+}
+
+func (s *priceService) GetRates(ctx context.Context) map[string]float64 {
+	rates := make(map[string]float64)
+	assets := s.assetService.GetSupportedAssets()
+
+	rates["PLN"] = 1
+
+	for _, a := range assets {
+		key := fmt.Sprintf("%s:%s", a.Type, a.Symbol)
+
+		rate, err := s.redisClient.Get(ctx, key).Float64()
+		if err != nil {
+			log.Printf("can't get rate for %s: %v", key, err.Error())
+		}
+
+		rates[a.Symbol] = rate
+	}
+
+	return rates
 }
 
 func (s *priceService) fetchCrypto(ctx context.Context, assets []models.AssetInfo) {
