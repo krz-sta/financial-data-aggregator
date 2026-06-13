@@ -42,7 +42,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Cl
 
 	authHandler := auth.NewHandler(authService)
 	userHandler := user.NewHandler(userService)
-	healthHandler := health.NewHandler(db)
+	healthHandler := health.NewHandler(db, redis)
 	portfolioHandler := portfolio.NewHandler(portfolioService)
 	assetHandler := asset.NewHandler(assetService)
 	priceHandler := price.NewHandler(priceService)
@@ -58,11 +58,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Cl
 			authGroup.POST("/login", authHandler.Login)
 		}
 
-		protected := api.Group("/protected").Use(middleware.AuthMiddleware(jwtKey))
+		protected := api.Group("/protected", middleware.AuthMiddleware(jwtKey))
 		{
 			protected.POST("/profile", userHandler.GetProfile)
 
-			portfolioGroup := api.Group("/portfolio")
+			portfolioGroup := protected.Group("/portfolio")
 			{
 				portfolioGroup.POST("", portfolioHandler.AddPortfolioItem)
 				portfolioGroup.DELETE("/:id", portfolioHandler.DeletePortfolioItem)
@@ -72,6 +72,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Cl
 		healthGroup := api.Group("/health")
 		{
 			healthGroup.GET("/db", healthHandler.DBHealth)
+			healthGroup.GET("/redis", healthHandler.RedisHealth)
 		}
 	}
 }

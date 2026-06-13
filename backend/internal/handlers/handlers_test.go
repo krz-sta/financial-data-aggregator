@@ -1,45 +1,56 @@
 package handlers
 
 import (
+	"io"
+	"log"
+	"os"
 	"testing"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/redis/go-redis/v9"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSetupRouter(t *testing.T) {
+	log.SetOutput(io.Discard)
+	defer log.SetOutput(os.Stdout)
+
 	gin.SetMode(gin.TestMode)
 	router := gin.New()
 
 	jwt_secret := "test_secret_key"
 
-	testRedis := redis.NewClient(&redis.Options{})
+	testRedis := redis.NewClient(&redis.Options{
+		Addr:        "localhost:6379",
+		MaxRetries:  -1,
+		DialTimeout: time.Millisecond,
+	})
 
 	SetupRoutes(router, nil, jwt_secret, testRedis)
 
 	routes := router.Routes()
 
-	foundRegister := false
-
-	for _, r := range routes {
-		if r.Path == "/api/auth/register" && r.Method == "POST" {
-			foundRegister = true
-		}
-
-		if r.Path == "/api/auth/login" && r.Method == "POST" {
-			foundRegister = true
-		}
-
-		if r.Path == "/api/protected/profile" && r.Method == "POST" {
-			foundRegister = true
-		}
-
-		if r.Path == "/api/health/db" && r.Method == "GET" {
-			foundRegister = true
-		}
+	expectedRoutes := map[string]string{
+		"/api/auth/register":           "POST",
+		"/api/auth/login":              "POST",
+		"/api/protected/profile":       "POST",
+		"/api/health/db":               "GET",
+		"/api/health/redis":            "GET",
+		"/api/assets":                  "GET",
+		"/api/rates":                   "GET",
+		"/api/protected/portfolio":     "POST",
+		"/api/protected/portfolio/:id": "DELETE",
 	}
 
-	if !foundRegister {
-		t.Errorf("Router did not register route")
+	for path, method := range expectedRoutes {
+		found := false
+		for _, r := range routes {
+			if r.Path == path && r.Method == method {
+				found = true
+				break
+			}
+		}
+		assert.True(t, found, "Missing route: "+method+" "+path)
 	}
 }
