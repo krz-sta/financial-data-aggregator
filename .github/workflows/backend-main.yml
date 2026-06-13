@@ -1,0 +1,32 @@
+name: Backend Production CI
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./backend    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.25.9'
+
+      - name: Install dependencies
+        run: go mod download
+
+      - name: Run Tests
+        run: go test -v -coverprofile=coverage.out ./... # Rekurencyjnie szuka wszystkich plików kończących się na _test.go
+
+      - name: Coverage report
+        run: go tool cover -func=coverage.out

@@ -1,0 +1,127 @@
+<div class="flex flex-col min-h-screen">
+    <app-header></app-header>
+
+    <main class="max-w-7xl mx-auto px-6 py-12 flex-1 text-white bg-black border-x border-zinc-900 w-full">
+        
+
+        <div class="mb-8 flex items-center gap-3">
+            <a routerLink="/home" class="text-zinc-500 hover:text-white transition-colors font-mono text-sm tracking-widest flex items-center gap-2 group">
+                <svg class="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                PORTFOLIO
+            </a>
+            <span class="text-zinc-700 font-mono">/</span>
+            <span class="text-white font-mono text-sm tracking-widest">{{ symbol() }}</span>
+        </div>
+
+
+        <div class="mb-8 pb-6 border-b border-zinc-800 flex flex-col sm:flex-row justify-between sm:items-end gap-4">
+            <div>
+                <h1 class="text-3xl font-mono tracking-widest text-white mb-2">{{ symbol() }}</h1>
+                <p class="text-zinc-500 font-mono text-sm">PRICE HISTORY — LAST {{ selectedPeriod() === '7d' ? '7' : '30' }} DAYS</p>
+            </div>
+            <div class="flex items-end gap-4">
+
+                <div>
+                    <span class="text-xs font-mono text-zinc-500 block mb-2">PERIOD</span>
+                    <div class="flex border border-zinc-800">
+                        <button 
+                            (click)="setPeriod('7d')"
+                            class="px-4 py-2 min-h-[44px] text-xs font-mono tracking-widest transition-colors cursor-pointer"
+                            [class.bg-white]="selectedPeriod() === '7d'"
+                            [class.text-black]="selectedPeriod() === '7d'"
+                            [class.text-zinc-500]="selectedPeriod() !== '7d'"
+                            [class.hover:text-white]="selectedPeriod() !== '7d'">
+                            7D
+                        </button>
+                        <button 
+                            (click)="setPeriod('30d')"
+                            class="px-4 py-2 min-h-[44px] text-xs font-mono tracking-widest transition-colors cursor-pointer border-l border-zinc-800"
+                            [class.bg-white]="selectedPeriod() === '30d'"
+                            [class.text-black]="selectedPeriod() === '30d'"
+                            [class.text-zinc-500]="selectedPeriod() !== '30d'"
+                            [class.hover:text-white]="selectedPeriod() !== '30d'">
+                            30D
+                        </button>
+                    </div>
+                </div>
+
+                <div>
+                    <span class="text-xs font-mono text-zinc-500 block mb-2">CURRENCY</span>
+                    <app-select 
+                        [value]="marketService.selectedCurrency()"
+                        (valueChange)="marketService.selectedCurrency.set($event)"
+                        [options]="currencies"
+                        class="w-full sm:w-36 block"
+                    ></app-select>
+                </div>
+            </div>
+        </div>
+
+        @if (isLoading()) {
+            <div class="h-[500px] flex items-center justify-center font-mono text-zinc-500 uppercase tracking-widest animate-pulse border border-zinc-900">
+                LOADING CHART DATA...
+            </div>
+        } @else if (error()) {
+            <div class="h-[500px] flex flex-col items-center justify-center border border-zinc-900 gap-4">
+                <p class="text-red-500 font-mono text-sm">{{ error() }}</p>
+                <a routerLink="/home" class="px-6 py-2 font-mono text-xs border border-zinc-800 text-zinc-400 hover:text-white hover:border-zinc-500 transition-colors tracking-widest">
+                    BACK TO PORTFOLIO
+                </a>
+            </div>
+        }
+
+
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-px bg-zinc-800 mb-8 border border-zinc-800"
+             [class.hidden]="isLoading() || error()">
+            <div class="bg-black p-5">
+                <span class="text-xs font-mono text-zinc-500 block mb-1 tracking-wider">CURRENT PRICE</span>
+                <span class="text-lg font-mono text-white font-bold">
+                    {{ marketService.convertUsdToFiat(currentPrice() || 0) | currency:marketService.selectedCurrency() }}
+                </span>
+            </div>
+            <div class="bg-black p-5">
+                <span class="text-xs font-mono text-zinc-500 block mb-1 tracking-wider">{{ selectedPeriod() === '7d' ? '7D' : '30D' }} CHANGE</span>
+                <span class="text-lg font-mono font-bold"
+                    [class.text-green-400]="(priceChange() ?? 0) >= 0"
+                    [class.text-red-400]="(priceChange() ?? 0) < 0">
+                    {{ (priceChange() ?? 0) >= 0 ? '+' : '' }}{{ (priceChange() ?? 0) | number:'1.2-2' }}%
+                </span>
+            </div>
+            <div class="bg-black p-5">
+                <span class="text-xs font-mono text-zinc-500 block mb-1 tracking-wider">{{ selectedPeriod() === '7d' ? '7D' : '30D' }} HIGH</span>
+                <span class="text-lg font-mono text-white font-bold">
+                    {{ marketService.convertUsdToFiat(highPrice() || 0) | currency:marketService.selectedCurrency() }}
+                </span>
+            </div>
+            <div class="bg-black p-5">
+                <span class="text-xs font-mono text-zinc-500 block mb-1 tracking-wider">{{ selectedPeriod() === '7d' ? '7D' : '30D' }} LOW</span>
+                <span class="text-lg font-mono text-white font-bold">
+                    {{ marketService.convertUsdToFiat(lowPrice() || 0) | currency:marketService.selectedCurrency() }}
+                </span>
+            </div>
+        </div>
+
+
+        <div class="border border-zinc-800" [class.hidden]="isLoading() || error()">
+            <div #chartWrapper class="w-full relative">
+                <canvas #chartCanvas
+                    class="w-full cursor-crosshair"
+                ></canvas>
+
+                @if (showTooltip()) {
+                    <div class="absolute pointer-events-none z-10 px-3 py-2 bg-zinc-900 border border-zinc-700 font-mono text-xs shadow-xl"
+                         [style.left.px]="hoverX() + 12"
+                         [style.top.px]="hoverY() - 40">
+                        <div class="text-zinc-400">{{ hoverDate() }}</div>
+                        <div class="text-white font-bold">{{ marketService.convertUsdToFiat(hoverPrice() || 0) | currency:marketService.selectedCurrency() }}</div>
+                    </div>
+                }
+            </div>
+        </div>
+
+    </main>
+
+    <app-footer></app-footer>
+</div>
