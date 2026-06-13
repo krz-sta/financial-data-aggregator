@@ -12,3 +12,8 @@ type FrankfurterAsset struct {
 	Quote string  `json:"quote"`
 	Rate  float64 `json:"rate"`
 }
+
+type HistoryPoint struct {
+	Timestamp int64   `json:"timestamp"`
+	Price     float64 `json:"price"`
+}
