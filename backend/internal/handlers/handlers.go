@@ -51,6 +51,7 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Cl
 	{
 		api.GET("/assets", assetHandler.GetAssets)
 		api.GET("/rates", priceHandler.GetRates)
+		api.GET("/rates/history/:symbol", priceHandler.GetHistory)
 
 		authGroup := api.Group("/auth")
 		{

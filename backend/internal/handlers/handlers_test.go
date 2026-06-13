@@ -39,6 +39,7 @@ func TestSetupRouter(t *testing.T) {
 		"/api/health/redis":            "GET",
 		"/api/assets":                  "GET",
 		"/api/rates":                   "GET",
+		"/api/rates/history/:symbol":   "GET",
 		"/api/protected/portfolio":     "POST",
 		"/api/protected/portfolio/:id": "DELETE",
 	}
