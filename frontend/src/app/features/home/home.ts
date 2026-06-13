@@ -7,11 +7,12 @@ import { MarketService } from '../../shared/services/market.service';
 import { UpperCasePipe, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
+import { CustomSelectComponent } from '../../shared/components/select/select';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [Header, Footer, UpperCasePipe, CurrencyPipe, DatePipe, FormsModule],
+  imports: [Header, Footer, UpperCasePipe, CurrencyPipe, DatePipe, FormsModule, CustomSelectComponent],
   templateUrl: './home.html',
   styleUrl: './home.scss',
 })
@@ -30,11 +31,21 @@ export class Home implements OnInit {
 
   addForm = signal({ symbol: '', amount: null as number | null });
 
+  currencies = ['USD', 'EUR', 'PLN', 'GBP'];
+
   cryptoAssets = computed(() => {
     return this.allAssets().filter(asset => 
       asset.type?.toLowerCase() !== 'fiat' && asset.type?.toLowerCase() !== 'currency'
     );
   });
+
+  cryptoAssetsOptions = computed(() => {
+    return this.cryptoAssets().map(asset => ({
+      value: asset.symbol,
+      label: `${asset.symbol} - ${asset.name}`
+    }));
+  });
+
 
   groupedPortfolio = computed(() => {
     const portfolio = this.profileData()?.portfolio || [];

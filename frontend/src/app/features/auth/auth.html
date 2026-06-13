@@ -5,11 +5,11 @@
     <section class="w-full max-w-md bg-black p-8 border border-zinc-800 shadow-2xl">
       
       <div class="flex gap-px mb-8 bg-zinc-800">
-        <button type="button" (click)="setMode('login')" [class]="'flex-1 py-3 text-xs font-mono tracking-widest transition-colors ' +
+        <button type="button" (click)="setMode('login')" [class]="'hover:cursor-pointer flex-1 py-3 text-xs font-mono tracking-widest transition-colors ' +
             (authMode() === 'login' ? 'bg-white text-black' : 'bg-black text-zinc-500 hover:text-zinc-300')">
           LOG IN
         </button>
-        <button type="button" (click)="setMode('signup')" [class]="'flex-1 py-3 text-xs font-mono tracking-widest transition-colors ' +
+        <button type="button" (click)="setMode('signup')" [class]="'hover:cursor-pointer flex-1 py-3 text-xs font-mono tracking-widest transition-colors ' +
           (authMode() === 'signup' ? 'bg-white text-black' : 'bg-black text-zinc-500 hover:text-zinc-300')">
           SIGN UP
         </button>
@@ -65,7 +65,7 @@
         </div>
 
         <button type="submit" [disabled]="isLoading()" 
-          class="w-full py-3 mt-4 bg-white text-black hover:bg-zinc-100 transition-colors text-xs tracking-widest uppercase font-bold disabled:opacity-50 disabled:cursor-wait">
+          class="hover:cursor-pointer w-full py-3 mt-4 bg-white text-black hover:bg-zinc-100 transition-colors text-xs tracking-widest uppercase font-bold disabled:opacity-50 disabled:cursor-wait">
           @if (isLoading()) {
             EXECUTING...
           } @else {

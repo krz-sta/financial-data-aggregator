@@ -2,14 +2,14 @@
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between w-full">
 
-            <div class="flex items-center gap-3 w-1/4 sm:w-1/3">
+            <div routerLink="/" class="flex items-center gap-3 w-1/4 sm:w-1/3 hover:cursor-pointer">
                 <div class="w-6 h-6 border border-white flex items-center justify-center">
                     <svg lucideTrendingUp class="w-3.5 h-3.5 text-white"></svg>
                 </div>
                 <span class="text-sm font-mono text-white tracking-widest hidden sm:inline-block">fin<span class="text-zinc-400">.</span>data</span>
             </div>
 
-            <div class="flex justify-center w-2/4 sm:w-1/3">
+            <div class="flex justify-center w-2/4 gap-2 sm:w-1/3">
                 @if (!isAuthPage() && isLoggedIn()) {
                     <div class="relative w-full max-w-md">
                         <svg lucideSearch class="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-zinc-600"></svg>
@@ -27,37 +27,21 @@
             <div class="flex justify-end w-1/4 sm:w-1/3">
                 @if (isLoggedIn()) {
                     <div class="flex items-center gap-4">
-                        
-                        <select 
-                        [value]="marketService.selectedCurrency()"
-                        (change)="marketService.selectedCurrency.set($any($event.target).value)"
-                        class="bg-black text-xs font-mono text-zinc-300 border border-zinc-800 py-2 px-2 focus:outline-none focus:border-zinc-600 hidden sm:block">
-                            <option value="USD">USD</option>
-                            <option value="EUR">EUR</option>
-                            <option value="PLN">PLN</option>
-                            <option value="GBP">GBP</option>
-                        </select>
-
-                        @if (!isHomePage()) {
-                            <button routerLink="/home" class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest hidden sm:block">
-                                DASHBOARD
-                            </button>
-                        }
-                        <button (click)="handleLogout()" class="px-4 py-2 text-xs font-mono bg-zinc-900 text-zinc-400 border border-zinc-800 hover:border-zinc-700 hover:text-white transition-colors tracking-widest uppercase">
+                        <button (click)="handleLogout()" class="px-4 py-2 text-xs font-mono bg-white text-black hover:bg-zinc-100 transition-colors tracking-widest hover:cursor-pointer">
                             LOG OUT
                         </button>
                     </div>
                 } @else if (isAuthPage()) {
-                    <button routerLink="/" class="group px-4 py-2 flex items-center justify-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest">
+                    <button routerLink="/" class="group px-4 py-2 flex items-center justify-center gap-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest hover:cursor-pointer">
                         <svg lucideArrowLeft class="w-4 h-4 mb-[2px] group-hover:-translate-x-1 transition-transform"></svg>
                         <p class="leading-none">GO BACK</p>
                     </button>
                 } @else {
                     <div class="flex items-center gap-2">
-                        <button routerLink="/auth" [queryParams]="{ mode: 'login'}" class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest">
+                        <button routerLink="/auth" [queryParams]="{ mode: 'login'}" class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest hover:cursor-pointer">
                             LOG IN
                         </button>
-                        <button routerLink="/auth" [queryParams]="{ mode: 'signup'}" class="px-4 py-2 text-xs font-mono bg-white text-black hover:bg-zinc-100 transition-colors tracking-widest">
+                        <button routerLink="/auth" [queryParams]="{ mode: 'signup'}" class="px-4 py-2 text-xs font-mono bg-white text-black hover:bg-zinc-100 transition-colors tracking-widest hover:cursor-pointer">
                             SIGN UP
                         </button>
                     </div>
