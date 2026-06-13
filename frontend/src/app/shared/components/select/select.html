@@ -1,0 +1,59 @@
+<div class="relative w-full font-mono" [id]="id">
+  <button
+    type="button"
+    [disabled]="disabled"
+    (click)="toggleDropdown()"
+    class="w-full flex items-center justify-between px-4 py-3 bg-black border border-zinc-800 focus:border-zinc-500 hover:border-zinc-700 text-sm text-left text-zinc-300 focus:outline-none transition-all duration-200 cursor-pointer min-h-[44px] disabled:opacity-50 disabled:cursor-not-allowed select-none"
+    [class.border-zinc-500]="isOpen"
+    aria-haspopup="listbox"
+    [aria-expanded]="isOpen"
+  >
+    <span class="truncate" [class.text-zinc-600]="value === null || value === undefined || value === ''">
+      {{ getSelectedLabel() }}
+    </span>
+    
+    <!-- Chevron Arrow -->
+    <svg 
+      class="w-4 h-4 text-zinc-500 transition-transform duration-200 ml-2 shrink-0" 
+      [class.rotate-180]="isOpen"
+      fill="none" 
+      stroke="currentColor" 
+      viewBox="0 0 24 24"
+    >
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+    </svg>
+  </button>
+
+  <!-- Dropdown List -->
+  @if (isOpen) {
+    <ul
+      class="absolute left-0 right-0 mt-1.5 bg-black border border-zinc-800 shadow-2xl shadow-black/95 z-50 max-h-60 overflow-y-auto focus:outline-none focus-within:outline-none animate-[fadeIn_0.15s_ease-out]"
+      role="listbox"
+    >
+      @for (option of options; track $index) {
+        <li
+          (click)="selectOption(option)"
+          (mouseenter)="focusedIndex = $index"
+          class="px-4 py-3 text-sm cursor-pointer transition-all duration-150 text-zinc-400 select-none flex items-center justify-between"
+          [class.bg-zinc-900]="focusedIndex === $index"
+          [class.text-white]="focusedIndex === $index || getValue(option) === value"
+          [class.bg-zinc-950]="getValue(option) === value"
+          [class.border-l-2]="getValue(option) === value"
+          [class.border-white]="getValue(option) === value"
+          [class.font-bold]="getValue(option) === value"
+          role="option"
+          [aria-selected]="getValue(option) === value"
+        >
+          <span>{{ getLabel(option) }}</span>
+          
+          @if (getValue(option) === value) {
+            <!-- Checkmark -->
+            <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
+            </svg>
+          }
+        </li>
+      }
+    </ul>
+  }
+</div>
