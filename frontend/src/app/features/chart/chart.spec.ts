@@ -27,7 +27,10 @@ describe('Chart Component', () => {
         MarketService,
         {
           provide: ActivatedRoute,
-          useValue: { snapshot: { paramMap: { get: () => 'BTC' } } }
+          useValue: {
+            paramMap: of({ get: () => 'BTC' }),
+            snapshot: { paramMap: { get: () => 'BTC' } }
+          }
         }
       ]
     }).compileComponents();
