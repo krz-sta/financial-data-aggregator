@@ -4,17 +4,20 @@ import { LucideArrowLeft, LucideSearch, LucideTrendingUp } from '@lucide/angular
 import { filter, map } from 'rxjs';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { AuthService } from '../../services/auth';
+import { MarketService } from '../../services/market.service';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-header',
   standalone: true,
-  imports: [LucideTrendingUp, LucideSearch, RouterLink, LucideArrowLeft],
+  imports: [LucideTrendingUp, LucideSearch, RouterLink, LucideArrowLeft, FormsModule],
   templateUrl: './header.html',
   styleUrl: './header.scss',
 })
 export class Header {
   private router = inject(Router);
-  private authService = inject(AuthService);
+  public authService = inject(AuthService);
+  public marketService = inject(MarketService);
 
   private currentUrl = toSignal(
     this.router.events.pipe(
@@ -24,15 +27,13 @@ export class Header {
     { initialValue: this.router.url }
   );
 
-  // Sprawdzamy czy jesteśmy na podstronie /auth (wycinamy query params)
   isAuthPage = computed(() => this.currentUrl().split('?')[0] === '/auth');
   isHomePage = computed(() => this.currentUrl().split('?')[0] === '/home');
-  
-  // Pobieramy stan zalogowania bezpośrednio z sygnału w AuthService
   isLoggedIn = computed(() => this.authService.isLoggedIn());
 
   handleLogout() {
     this.authService.logout();
+    this.marketService.searchQuery.set('');
     this.router.navigate(['/']);
   }
 }

@@ -6,9 +6,15 @@
   } @else if (error()) {
     <p class="text-red-500 font-mono">{{ error() }}</p>
   } @else {
-    <div class="mb-8 border-b border-zinc-800 pb-4">
-      <h1 class="text-2xl font-mono tracking-widest">WELCOME, {{ profileData()?.displayName | uppercase }}</h1>
-      <p class="text-zinc-400 text-sm font-mono mt-2">{{ profileData()?.email }}</p>
+    <div class="mb-8 border-b border-zinc-800 pb-4 flex justify-between items-end">
+      <div>
+        <h1 class="text-2xl font-mono tracking-widest">WELCOME, {{ profileData()?.displayName | uppercase }}</h1>
+        <p class="text-zinc-400 text-sm font-mono mt-2">{{ profileData()?.email }}</p>
+      </div>
+      <div class="text-right hidden sm:block">
+        <span class="text-xs font-mono text-zinc-500 block">MEMBER SINCE</span>
+        <span class="text-sm font-mono text-zinc-300">{{ profileData()?.createdAt | date:'longDate' }}</span>
+      </div>
     </div>
 
     <div class="mb-10 p-6 border border-zinc-800 bg-zinc-950">
@@ -23,7 +29,7 @@
             name="symbol" 
             class="w-full p-3 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-500 text-sm font-mono">
             <option value="" disabled selected>SELECT ASSET</option>
-            @for (asset of availableAssets(); track asset.symbol) {
+            @for (asset of cryptoAssets(); track asset.symbol) {
               <option [value]="asset.symbol">{{ asset.symbol }} - {{ asset.name }}</option>
             }
           </select>
@@ -57,31 +63,32 @@
         <h2 class="text-xl font-mono text-zinc-300">YOUR PORTFOLIO</h2>
         <div class="text-right">
           <span class="text-xs font-mono text-zinc-500 block">TOTAL BALANCE</span>
-          <span class="text-2xl font-mono font-bold text-white">{{ totalBalance() | currency:'USD' }}</span>
+          <span class="text-2xl font-mono font-bold text-white">
+            {{ totalBalance() | currency:marketService.selectedCurrency() }}
+          </span>
         </div>
       </div>
       
-      @if (profileData()?.portfolio?.length) {
+      @if (filteredPortfolio().length) {
         <div class="grid gap-3">
-          @for (item of profileData()?.portfolio; track item.id) {
-            <div class="p-4 border border-zinc-800 flex justify-between items-center group hover:border-zinc-600 transition-colors">
+          @for (item of filteredPortfolio(); track item.symbol) {
+            <div 
+              (click)="handleRowClick(item.symbol)"
+              class="cursor-pointer p-4 border border-zinc-800 flex justify-between items-center group hover:border-zinc-500 bg-zinc-950/50 hover:bg-zinc-900 transition-all">
               <div>
                 <span class="font-bold font-mono text-lg block">{{ item.symbol }}</span>
-                <span class="text-zinc-500 font-mono text-sm">AMOUNT: {{ item.amount }}</span>
+                <span class="text-zinc-500 font-mono text-sm">TOTAL AMOUNT: {{ item.amount }}</span>
               </div>
               
               <div class="flex items-center gap-6">
                 <div class="text-right">
                   <span class="font-mono text-white block">
-                    {{ (item.amount * (rates()[item.symbol] || 0)) | currency:'USD' }}
-                  </span>
-                  <span class="text-xs font-mono text-zinc-600">
-                    PRICE: {{ (rates()[item.symbol] || 0) | currency:'USD' }}
+                    {{ getItemValue(item.amount, item.symbol) | currency:marketService.selectedCurrency() }}
                   </span>
                 </div>
                 
                 <button 
-                  (click)="handleDelete(item.id)" 
+                  (click)="handleDeleteGroup(item.ids, $event)" 
                   class="px-4 py-2 text-xs font-mono text-red-500/70 border border-red-900/30 hover:border-red-500/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all uppercase">
                   DELETE
                 </button>
@@ -90,7 +97,9 @@
           }
         </div>
       } @else {
-        <p class="text-zinc-600 font-mono text-sm border border-zinc-800 p-6 text-center">NO ASSETS IN PORTFOLIO YET.</p>
+        <p class="text-zinc-600 font-mono text-sm border border-zinc-800 p-6 text-center uppercase">
+          {{ marketService.searchQuery() ? 'NO ASSETS FOUND MATCHING SEARCH.' : 'NO ASSETS IN PORTFOLIO YET.' }}
+        </p>
       }
     </div>
   }
