@@ -1,4 +1,4 @@
-/* You can add global styles to this file, and also import other style files */
+
 
 @import "tailwindcss";
 
@@ -8,4 +8,13 @@
   --font-sans: 'Plus Jakarta Sans', sans-serif;
   
   --font-display: 'Clash Display', sans-serif;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overscroll-behavior: none;
+  background-color: #000000;
 }

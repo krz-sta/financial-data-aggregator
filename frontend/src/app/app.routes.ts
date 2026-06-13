@@ -19,6 +19,11 @@ export const routes: Routes = [
     data: { showAuthButtons: false }
   },
   {
+    path: 'chart/:symbol',
+    loadComponent: () => import('./features/chart/chart').then(m => m.Chart),
+    data: { showAuthButtons: false }
+  },
+  {
     path: '**',
     redirectTo: ''
   }

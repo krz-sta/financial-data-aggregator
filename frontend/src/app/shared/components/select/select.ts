@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef, ElementRef, HostListener } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ElementRef, HostListener, computed, signal } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -23,6 +23,9 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() placeholder: string = 'Select option';
   @Input() disabled: boolean = false;
   @Input() id?: string;
+  @Input() searchable: boolean = true;
+
+  searchQuery = signal<string>('');
 
   private _value: any = null;
 
@@ -43,6 +46,22 @@ export class CustomSelectComponent implements ControlValueAccessor {
 
   isOpen = false;
   focusedIndex = -1;
+
+  filteredOptions = computed(() => {
+    let opts = this.options || [];
+    
+
+    opts = [...opts].sort((a, b) => {
+      const labelA = this.getLabel(a).toLowerCase();
+      const labelB = this.getLabel(b).toLowerCase();
+      return labelA.localeCompare(labelB);
+    });
+
+    const query = this.searchQuery().toLowerCase().trim();
+    if (!query) return opts;
+
+    return opts.filter(opt => this.getLabel(opt).toLowerCase().includes(query));
+  });
 
   onChange: any = () => {};
   onTouched: any = () => {};
@@ -69,10 +88,17 @@ export class CustomSelectComponent implements ControlValueAccessor {
     if (this.disabled) return;
     this.isOpen = !this.isOpen;
     if (this.isOpen) {
-      this.focusedIndex = this.options.findIndex(opt => this.getValue(opt) === this.value);
+      this.searchQuery.set('');
+      const opts = this.filteredOptions();
+      this.focusedIndex = opts.findIndex(opt => this.getValue(opt) === this.value);
       if (this.focusedIndex === -1) {
         this.focusedIndex = 0;
       }
+
+      setTimeout(() => {
+        const input = this.elementRef.nativeElement.querySelector('.select-search-input');
+        if (input) input.focus();
+      }, 0);
     }
   }
 
@@ -120,27 +146,35 @@ export class CustomSelectComponent implements ControlValueAccessor {
       this.isOpen = false;
       event.preventDefault();
     } else if (event.key === 'ArrowDown') {
+      const opts = this.filteredOptions();
       if (!this.isOpen) {
         this.isOpen = true;
         this.focusedIndex = 0;
       } else {
-        this.focusedIndex = (this.focusedIndex + 1) % this.options.length;
+        this.focusedIndex = (this.focusedIndex + 1) % Math.max(1, opts.length);
       }
       this.scrollToFocused();
       event.preventDefault();
     } else if (event.key === 'ArrowUp') {
+      const opts = this.filteredOptions();
       if (!this.isOpen) {
         this.isOpen = true;
-        this.focusedIndex = this.options.length - 1;
+        this.focusedIndex = Math.max(0, opts.length - 1);
       } else {
-        this.focusedIndex = (this.focusedIndex - 1 + this.options.length) % this.options.length;
+        this.focusedIndex = (this.focusedIndex - 1 + opts.length) % Math.max(1, opts.length);
       }
       this.scrollToFocused();
       event.preventDefault();
     } else if (event.key === 'Enter' || event.key === ' ') {
+
+      if (event.key === ' ' && (event.target as HTMLElement).tagName === 'INPUT') {
+        return;
+      }
+
+      const opts = this.filteredOptions();
       if (this.isOpen) {
-        if (this.focusedIndex >= 0 && this.focusedIndex < this.options.length) {
-          this.selectOption(this.options[this.focusedIndex]);
+        if (this.focusedIndex >= 0 && this.focusedIndex < opts.length) {
+          this.selectOption(opts[this.focusedIndex]);
         }
       } else {
         this.isOpen = true;

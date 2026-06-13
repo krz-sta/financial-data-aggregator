@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable, signal } from '@angular/core';
 import { Observable } from 'rxjs';
+import { Asset, RatesResponse, HistoryPoint, FiatRates } from '../models/models';
 
 @Injectable({
   providedIn: 'root'
@@ -12,28 +13,29 @@ export class MarketService {
   selectedCurrency = signal<string>('USD');
   searchQuery = signal<string>('');
   
-  fiatRates = signal<any>({ USD: 1, EUR: 0.92, PLN: 4.00, GBP: 0.79 });
+  fiatRates = signal<FiatRates>({ USD: 1, EUR: 0.92, PLN: 4.00, GBP: 0.79 });
 
-  constructor() {
-    this.fetchFiatRates();
+  getAssets(): Observable<Asset[]> {
+    return this.http.get<Asset[]>(`${this.apiUrl}/assets`);
   }
 
-  getAssets(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.apiUrl}/assets`);
+  getRates(): Observable<RatesResponse> {
+    return this.http.get<RatesResponse>(`${this.apiUrl}/rates`);
   }
 
-  getRates(): Observable<any> {
-    return this.http.get<any>(`${this.apiUrl}/rates`);
+  getHistory(symbol: string): Observable<HistoryPoint[]> {
+    return this.http.get<HistoryPoint[]>(`${this.apiUrl}/rates/history/${symbol}`);
   }
 
-  private fetchFiatRates() {
-    this.http.get('https://api.exchangerate-api.com/v4/latest/USD').subscribe({
-      next: (res: any) => {
-        if (res && res.rates) {
-          this.fiatRates.set(res.rates);
-        }
-      },
-      error: () => console.warn('Failed to load fiat rates, using fallback values.')
-    });
+  convertCryptoToFiat(amount: number, cryptoSymbol: string, currentRates: RatesResponse): number {
+    const cryptoRateInUsd = currentRates[cryptoSymbol] || 0;
+    const valueInUsd = amount * cryptoRateInUsd;
+    return this.convertUsdToFiat(valueInUsd);
+  }
+
+  convertUsdToFiat(usdValue: number): number {
+    const fiat = this.selectedCurrency();
+    const rates = this.fiatRates() as any;
+    return usdValue * (rates[fiat] || 1);
   }
 }

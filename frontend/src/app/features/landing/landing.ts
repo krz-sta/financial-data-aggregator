@@ -14,9 +14,9 @@ import { Footer } from '../../shared/components/footer/footer';
 export class Landing {
   private router = inject(Router);
   features = [
-    { icon: 'wifi', title: 'LIVE WEBSOCKET', description: 'Real-time cryptocurrency prices via Binance WebSocket streams. No polling. No delays.' },
-    { icon: 'database', title: 'NBP INTEGRATION', description: 'Official Polish National Bank exchange rates. Updated daily. Accurate data.' },
-    { icon: 'zap', title: 'INSTANT UPDATES', description: 'Sub-second price updates. Automatic reconnection. Always connected.' },
-    { icon: 'shield', title: 'SECURE & RELIABLE', description: 'No server intermediaries. Direct API connections. Privacy-focused.' },
+    { icon: 'zap', title: 'COINGECKO INTEGRATION', description: 'Accurate cryptocurrency prices and historical data via CoinGecko API.' },
+    { icon: 'database', title: 'FRANKFURTER API', description: 'Reliable fiat currency exchange rates tracking against PLN via Frankfurter API.' },
+    { icon: 'wifi', title: 'PERIODIC UPDATES', description: 'Background workers fetch and update market data periodically.' },
+    { icon: 'shield', title: 'CACHED FOR SPEED', description: 'Redis-backed caching ensures fast data delivery and limits API requests.' },
   ];
 }
