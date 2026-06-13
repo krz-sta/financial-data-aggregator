@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, signal, computed } from '@angular/core';
+import { Router } from '@angular/router';
 import { Header } from '../../shared/components/header/header';
 import { Footer } from '../../shared/components/footer/footer';
 import { UserService } from '../../shared/services/user.service';
@@ -8,6 +9,7 @@ import { UpperCasePipe, CurrencyPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { forkJoin } from 'rxjs';
 import { CustomSelectComponent } from '../../shared/components/select/select';
+import { Asset, UserProfile, RatesResponse } from '../../shared/models/models';
 
 @Component({
   selector: 'app-home',
@@ -19,11 +21,12 @@ import { CustomSelectComponent } from '../../shared/components/select/select';
 export class Home implements OnInit {
   private userService = inject(UserService);
   private portfolioService = inject(PortfolioService);
+  private router = inject(Router);
   public marketService = inject(MarketService);
   
-  profileData = signal<any>(null);
-  allAssets = signal<any[]>([]); 
-  rates = signal<any>({});
+  profileData = signal<UserProfile | null>(null);
+  allAssets = signal<Asset[]>([]); 
+  rates = signal<RatesResponse>({});
   
   isLoading = signal(true);
   isSubmitting = signal(false);
@@ -41,11 +44,10 @@ export class Home implements OnInit {
 
   cryptoAssetsOptions = computed(() => {
     return this.cryptoAssets().map(asset => ({
-      value: asset.symbol,
-      label: `${asset.symbol} - ${asset.name}`
+      label: asset.symbol,
+      value: asset.symbol
     }));
   });
-
 
   groupedPortfolio = computed(() => {
     const portfolio = this.profileData()?.portfolio || [];
@@ -68,36 +70,22 @@ export class Home implements OnInit {
   });
 
   filteredPortfolio = computed(() => {
-    const portfolio = this.groupedPortfolio();
-    const query = this.marketService.searchQuery().toLowerCase().trim();
-    
-    if (!query) return portfolio;
-    return portfolio.filter((item: any) => item.symbol.toLowerCase().includes(query));
+    return this.groupedPortfolio();
   });
 
   totalBalance = computed(() => {
     const portfolio = this.groupedPortfolio();
     const currentRates = this.rates();
-    const fiat = this.marketService.selectedCurrency();
-    const fiatRates = this.marketService.fiatRates();
 
     if (!portfolio.length || !currentRates) return 0;
 
-    let totalUsd = portfolio.reduce((total: number, item: any) => {
-      const cryptoRateInUsd = currentRates[item.symbol] || 0;
-      return total + (item.amount * cryptoRateInUsd);
+    return portfolio.reduce((total: number, item: any) => {
+      return total + this.marketService.convertCryptoToFiat(item.amount, item.symbol, currentRates);
     }, 0);
-
-    return totalUsd * (fiatRates[fiat] || 1);
   });
 
   getItemValue(amount: number, symbol: string): number {
-    const currentRates = this.rates();
-    const fiat = this.marketService.selectedCurrency();
-    const fiatRates = this.marketService.fiatRates();
-    
-    const cryptoUsdValue = amount * (currentRates[symbol] || 0);
-    return cryptoUsdValue * (fiatRates[fiat] || 1);
+    return this.marketService.convertCryptoToFiat(amount, symbol, this.rates());
   }
 
   ngOnInit() { 
@@ -106,29 +94,34 @@ export class Home implements OnInit {
 
   fetchData() {
     this.isLoading.set(true);
+    this.error.set(null);
     
-    this.marketService.getAssets().subscribe({
-      next: (assets) => this.allAssets.set(assets),
-      error: (err) => console.error('Failed to load assets', err)
+    forkJoin({
+      assets: this.marketService.getAssets(),
+      rates: this.marketService.getRates(),
+      profile: this.userService.getProfile()
+    }).subscribe({
+      next: ({ assets, rates, profile }) => {
+        this.allAssets.set(assets);
+        this.rates.set(rates);
+        this.profileData.set(profile as UserProfile);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Failed to load initial data', err);
+        this.error.set('Failed to load dashboard data. Please try again.');
+        this.isLoading.set(false);
+      }
     });
-    
-    this.marketService.getRates().subscribe({
-      next: (ratesData) => this.rates.set(ratesData),
-      error: (err) => console.error('Failed to load rates', err)
-    });
-    
-    this.loadProfile();
   }
 
   loadProfile() {
     this.userService.getProfile().subscribe({
       next: (data) => {
-        this.profileData.set(data);
-        this.isLoading.set(false);
+        this.profileData.set(data as UserProfile);
       },
       error: (err) => {
-        this.error.set('Failed to load profile data.');
-        this.isLoading.set(false);
+        this.error.set('Failed to refresh profile data.');
       }
     });
   }
@@ -159,7 +152,7 @@ export class Home implements OnInit {
   }
 
   handleDeleteGroup(ids: string[], event: Event) {
-    event.stopPropagation();
+    event.stopPropagation(); 
     const deleteRequests = ids.map(id => this.portfolioService.deleteItem(id));
     
     forkJoin(deleteRequests).subscribe({
@@ -169,6 +162,6 @@ export class Home implements OnInit {
   }
 
   handleRowClick(symbol: string) {
-    alert(`todo`);
+    this.router.navigate(['/chart', symbol]);
   }
 }

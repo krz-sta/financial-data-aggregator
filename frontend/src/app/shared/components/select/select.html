@@ -12,7 +12,7 @@
       {{ getSelectedLabel() }}
     </span>
     
-    <!-- Chevron Arrow -->
+
     <svg 
       class="w-4 h-4 text-zinc-500 transition-transform duration-200 ml-2 shrink-0" 
       [class.rotate-180]="isOpen"
@@ -24,13 +24,25 @@
     </svg>
   </button>
 
-  <!-- Dropdown List -->
+
   @if (isOpen) {
-    <ul
-      class="absolute left-0 right-0 mt-1.5 bg-black border border-zinc-800 shadow-2xl shadow-black/95 z-50 max-h-60 overflow-y-auto focus:outline-none focus-within:outline-none animate-[fadeIn_0.15s_ease-out]"
-      role="listbox"
+    <div
+      class="absolute left-0 right-0 mt-1.5 bg-black border border-zinc-800 shadow-2xl shadow-black/95 z-50 focus:outline-none focus-within:outline-none animate-[fadeIn_0.15s_ease-out]"
     >
-      @for (option of options; track $index) {
+      @if (searchable) {
+        <div class="p-2 border-b border-zinc-800">
+          <input
+            type="text"
+            [value]="searchQuery()"
+            (input)="searchQuery.set($any($event.target).value)"
+            class="select-search-input w-full bg-zinc-950 border border-zinc-800 text-white px-3 py-2 text-sm font-mono focus:outline-none focus:border-zinc-500 placeholder-zinc-600"
+            placeholder="Search..."
+            (click)="$event.stopPropagation()"
+          />
+        </div>
+      }
+      <ul class="max-h-60 overflow-y-auto" role="listbox">
+        @for (option of filteredOptions(); track $index) {
         <li
           (click)="selectOption(option)"
           (mouseenter)="focusedIndex = $index"
@@ -47,13 +59,14 @@
           <span>{{ getLabel(option) }}</span>
           
           @if (getValue(option) === value) {
-            <!-- Checkmark -->
+
             <svg class="w-3.5 h-3.5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
             </svg>
           }
         </li>
       }
-    </ul>
+      </ul>
+    </div>
   }
 </div>

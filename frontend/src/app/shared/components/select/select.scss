@@ -1,5 +1,5 @@
 ul {
-  /* Thin custom scrollbar for dropdown */
+
   &::-webkit-scrollbar {
     width: 6px;
   }
@@ -7,11 +7,11 @@ ul {
     background: #000000;
   }
   &::-webkit-scrollbar-thumb {
-    background: #27272a; /* zinc-800 */
+    background: #27272a;
     border-radius: 3px;
   }
   &::-webkit-scrollbar-thumb:hover {
-    background: #3f3f46; /* zinc-700 */
+    background: #3f3f46;
   }
 }
 

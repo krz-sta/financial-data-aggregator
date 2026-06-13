@@ -10,16 +10,27 @@
             </div>
 
             <div class="flex justify-center w-2/4 gap-2 sm:w-1/3">
-                @if (!isAuthPage() && isLoggedIn()) {
+                @if (!isAuthPage()) {
                     <div class="relative w-full max-w-md">
                         <svg lucideSearch class="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-zinc-600"></svg>
                         <input
                             type="text"
                             [value]="marketService.searchQuery()"
                             (input)="marketService.searchQuery.set($any($event.target).value)"
-                            placeholder="Search portfolio..."
+                            placeholder="Search market..."
                             class="w-full pl-9 pr-3 py-2 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
                         />
+                        @if (marketService.searchQuery() && searchResults().length > 0) {
+                            <div class="absolute top-full left-0 w-full mt-2 bg-black border border-zinc-800 shadow-xl z-50">
+                                @for (result of searchResults(); track result.symbol) {
+                                    <div class="p-3 border-b border-zinc-800 last:border-0 hover:bg-zinc-900 cursor-pointer flex justify-between items-center" 
+                                         (click)="handleResultClick(result.symbol)">
+                                        <span class="font-mono text-white text-sm tracking-widest font-bold">{{ result.symbol }}</span>
+                                        <span class="font-mono text-zinc-500 text-xs truncate max-w-[60%] text-right">{{ result.name }}</span>
+                                    </div>
+                                }
+                            </div>
+                        }
                     </div>
                 }
             </div>
