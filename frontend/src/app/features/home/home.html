@@ -1,7 +1,33 @@
-<div class="font-mono min-h-screen flex flex-col bg-transparent">
-    <app-header />
-    <main class="flex-1">
+<app-header></app-header>
 
-    </main>
-    <app-footer />
-</div>
+<main class="max-w-7xl mx-auto px-6 py-12 min-h-screen text-white bg-black">
+  @if (isLoading()) {
+    <p class="text-zinc-500 font-mono">Loading data...</p>
+  } @else if (error()) {
+    <p class="text-red-500 font-mono">{{ error() }}</p>
+  } @else {
+    <div class="mb-8 border-b border-zinc-800 pb-4">
+      <h1 class="text-2xl font-mono tracking-widest">HI, {{ profileData()?.displayName | uppercase }}</h1>
+      <p class="text-zinc-400 text-sm font-mono mt-2">{{ profileData()?.email }}</p>
+    </div>
+
+    <div>
+      <h2 class="text-xl font-mono mb-4 text-zinc-300">YOUR ASSETS</h2>
+      
+      @if (profileData()?.portfolio?.length) {
+        <div class="grid gap-4">
+          @for (item of profileData()?.portfolio; track item.id) {
+            <div class="p-4 border border-zinc-800 bg-zinc-950 flex justify-between items-center">
+              <span class="font-bold font-mono">{{ item.symbol }}</span>
+              <span class="text-zinc-400 font-mono">Ilość: {{ item.amount }}</span>
+            </div>
+          }
+        </div>
+      } @else {
+        <p class="text-zinc-500 font-mono text-sm">You don't have any assets in your portfolio yet.</p>
+      }
+    </div>
+  }
+</main>
+
+<app-footer></app-footer>
