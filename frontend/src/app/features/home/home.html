@@ -2,29 +2,95 @@
 
 <main class="max-w-7xl mx-auto px-6 py-12 min-h-screen text-white bg-black">
   @if (isLoading()) {
-    <p class="text-zinc-500 font-mono">Loading data...</p>
+    <p class="text-zinc-500 font-mono">LOADING DATA...</p>
   } @else if (error()) {
     <p class="text-red-500 font-mono">{{ error() }}</p>
   } @else {
     <div class="mb-8 border-b border-zinc-800 pb-4">
-      <h1 class="text-2xl font-mono tracking-widest">HI, {{ profileData()?.displayName | uppercase }}</h1>
+      <h1 class="text-2xl font-mono tracking-widest">WELCOME, {{ profileData()?.displayName | uppercase }}</h1>
       <p class="text-zinc-400 text-sm font-mono mt-2">{{ profileData()?.email }}</p>
     </div>
 
+    <div class="mb-10 p-6 border border-zinc-800 bg-zinc-950">
+      <h2 class="text-lg font-mono mb-4 text-zinc-300">ADD NEW ASSET</h2>
+      
+      <form (submit)="handleAddAsset($event)" class="flex flex-col sm:flex-row gap-4 items-end">
+        <div class="flex-1 w-full">
+          <label class="block text-xs font-mono text-zinc-500 mb-2">ASSET SYMBOL</label>
+          <select 
+            [ngModel]="addForm().symbol" 
+            (ngModelChange)="addForm().symbol = $event"
+            name="symbol" 
+            class="w-full p-3 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-500 text-sm font-mono">
+            <option value="" disabled selected>SELECT ASSET</option>
+            @for (asset of availableAssets(); track asset.symbol) {
+              <option [value]="asset.symbol">{{ asset.symbol }} - {{ asset.name }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="flex-1 w-full">
+          <label class="block text-xs font-mono text-zinc-500 mb-2">AMOUNT</label>
+          <input 
+            type="number" 
+            [ngModel]="addForm().amount"
+            (ngModelChange)="addForm().amount = $event"
+            name="amount"
+            step="any"
+            min="0"
+            placeholder="0.00"
+            class="w-full p-3 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-500 text-sm font-mono"
+          />
+        </div>
+
+        <button 
+          type="submit" 
+          [disabled]="isSubmitting()"
+          class="w-full sm:w-auto px-8 py-3 font-mono text-sm bg-white text-black hover:bg-zinc-200 disabled:opacity-50 transition-colors tracking-widest uppercase">
+          {{ isSubmitting() ? 'ADDING...' : 'ADD' }}
+        </button>
+      </form>
+    </div>
+
     <div>
-      <h2 class="text-xl font-mono mb-4 text-zinc-300">YOUR ASSETS</h2>
+      <div class="flex justify-between items-end mb-4 border-b border-zinc-800 pb-2">
+        <h2 class="text-xl font-mono text-zinc-300">YOUR PORTFOLIO</h2>
+        <div class="text-right">
+          <span class="text-xs font-mono text-zinc-500 block">TOTAL BALANCE</span>
+          <span class="text-2xl font-mono font-bold text-white">{{ totalBalance() | currency:'USD' }}</span>
+        </div>
+      </div>
       
       @if (profileData()?.portfolio?.length) {
-        <div class="grid gap-4">
+        <div class="grid gap-3">
           @for (item of profileData()?.portfolio; track item.id) {
-            <div class="p-4 border border-zinc-800 bg-zinc-950 flex justify-between items-center">
-              <span class="font-bold font-mono">{{ item.symbol }}</span>
-              <span class="text-zinc-400 font-mono">Amount: {{ item.amount }}</span>
+            <div class="p-4 border border-zinc-800 flex justify-between items-center group hover:border-zinc-600 transition-colors">
+              <div>
+                <span class="font-bold font-mono text-lg block">{{ item.symbol }}</span>
+                <span class="text-zinc-500 font-mono text-sm">AMOUNT: {{ item.amount }}</span>
+              </div>
+              
+              <div class="flex items-center gap-6">
+                <div class="text-right">
+                  <span class="font-mono text-white block">
+                    {{ (item.amount * (rates()[item.symbol] || 0)) | currency:'USD' }}
+                  </span>
+                  <span class="text-xs font-mono text-zinc-600">
+                    PRICE: {{ (rates()[item.symbol] || 0) | currency:'USD' }}
+                  </span>
+                </div>
+                
+                <button 
+                  (click)="handleDelete(item.id)" 
+                  class="px-4 py-2 text-xs font-mono text-red-500/70 border border-red-900/30 hover:border-red-500/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all uppercase">
+                  DELETE
+                </button>
+              </div>
             </div>
           }
         </div>
       } @else {
-        <p class="text-zinc-500 font-mono text-sm">You don't have any assets in your portfolio yet.</p>
+        <p class="text-zinc-600 font-mono text-sm border border-zinc-800 p-6 text-center">NO ASSETS IN PORTFOLIO YET.</p>
       }
     </div>
   }

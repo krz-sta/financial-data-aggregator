@@ -58,11 +58,11 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Cl
 			authGroup.POST("/login", authHandler.Login)
 		}
 
-		protected := api.Group("/protected").Use(middleware.AuthMiddleware(jwtKey))
+		protected := api.Group("/protected", middleware.AuthMiddleware(jwtKey))
 		{
 			protected.POST("/profile", userHandler.GetProfile)
 
-			portfolioGroup := api.Group("/portfolio")
+			portfolioGroup := protected.Group("/portfolio")
 			{
 				portfolioGroup.POST("", portfolioHandler.AddPortfolioItem)
 				portfolioGroup.DELETE("/:id", portfolioHandler.DeletePortfolioItem)
