@@ -19,7 +19,7 @@
           @for (item of profileData()?.portfolio; track item.id) {
             <div class="p-4 border border-zinc-800 bg-zinc-950 flex justify-between items-center">
               <span class="font-bold font-mono">{{ item.symbol }}</span>
-              <span class="text-zinc-400 font-mono">Ilość: {{ item.amount }}</span>
+              <span class="text-zinc-400 font-mono">Amount: {{ item.amount }}</span>
             </div>
           }
         </div>
