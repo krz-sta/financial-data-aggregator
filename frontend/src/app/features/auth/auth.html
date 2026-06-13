@@ -78,4 +78,14 @@
   </main>
   
   <app-footer />
+
+  @if (errorMessage()) {
+    <div class="fixed top-24 left-1/2 -translate-x-1/2 bg-black border border-red-900 shadow-2xl z-50 overflow-hidden min-w-[150px]">
+      <div class="flex items-center justify-center gap-3 px-6 py-4 text-red-500 font-mono text-xs tracking-widest">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        ERROR
+      </div>
+      <div class="h-1 bg-red-900 w-full animate-shrink origin-left"></div>
+    </div>
+  }
 </div>

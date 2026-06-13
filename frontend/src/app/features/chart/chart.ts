@@ -58,6 +58,7 @@ export class Chart implements OnInit, OnDestroy, AfterViewInit {
   private dataLoaded = false;
   private mouseMoveListener: ((e: MouseEvent) => void) | null = null;
   private mouseLeaveListener: (() => void) | null = null;
+  private paramSub: any;
 
 
   private readonly PADDING_TOP = 24;
@@ -79,10 +80,12 @@ export class Chart implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnInit() {
-    const sym = this.route.snapshot.paramMap.get('symbol') || '';
-    this.symbol.set(sym.toUpperCase());
     this.dpr = window.devicePixelRatio || 1;
-    this.loadChartData();
+    this.paramSub = this.route.paramMap.subscribe(params => {
+      const sym = params.get('symbol') || '';
+      this.symbol.set(sym.toUpperCase());
+      this.loadChartData();
+    });
   }
 
   ngAfterViewInit() {
@@ -98,6 +101,9 @@ export class Chart implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngOnDestroy() {
+    if (this.paramSub) {
+      this.paramSub.unsubscribe();
+    }
     if (this.resizeObserver) {
       this.resizeObserver.disconnect();
     }
