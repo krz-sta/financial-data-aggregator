@@ -1,0 +1,93 @@
+services: 
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: ${DB_USER:-produser}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-prodpassword}
+      POSTGRES_DB: ${DB_NAME:-cointracker}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-produser} -d ${DB_NAME:-cointracker}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - default
+  
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - default
+
+  backend:
+    image: ghcr.io/krz-sta/financial-data-aggregator-backend:latest
+    environment:
+      - DB_HOST=db
+      - DB_USER=${DB_USER:-produser}
+      - DB_PASSWORD=${DB_PASSWORD:-prodpassword}
+      - DB_NAME=${DB_NAME:-cointracker}
+      - DB_PORT=5432
+      - ROUTER_PORT=8080
+      - ROUTER_HOST=0.0.0.0
+      - GIN_MODE=release
+      - JWT_SECRET=${JWT_SECRET:-jwt-prod-key-change-me}
+      - REDIS_HOST=redis    
+      - REDIS_PORT=6379     
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - proxy
+      - default
+    labels:
+      - "traefik.enable=true"
+      # ZMIEŃ NA SWOJĄ DOMENĘ
+      - "traefik.http.routers.backend.rule=Host(`fin.krzysztofstasiak.pl`) && PathPrefix(`/api`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls=true"
+      - "traefik.http.routers.backend.priority=100"
+      - "traefik.http.services.backend.loadbalancer.server.port=8080"
+
+  frontend:
+    image: ghcr.io/krz-sta/financial-data-aggregator-frontend:latest
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - proxy
+    labels:
+      - "traefik.enable=true"
+      # ZMIEŃ NA SWOJĄ DOMENĘ
+      - "traefik.http.routers.frontend.rule=Host(`fin.krzysztofstasiak.pl`) || Host(`www.fin.krzysztofstasiak.pl`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls=true"
+      - "traefik.http.routers.frontend.priority=50"
+      - "traefik.http.services.frontend.loadbalancer.server.port=80"
+
+  watchtower:
+    image: containrrr/watchtower
+    environment:
+      - DOCKER_API_VERSION=1.40
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/.docker/config.json:/config.json:ro
+    command: --interval 60 --cleanup
+    restart: unless-stopped
+
+networks:
+  proxy:
+    external: true
+  default:
+
+volumes:
+  pgdata: 
+  redis_data:

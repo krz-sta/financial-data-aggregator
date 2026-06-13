@@ -32,7 +32,7 @@ describe('UserService', () => {
     service.getProfile().subscribe(data => {
       expect(data).toEqual(mockProfile);
     });
-    const req = httpMock.expectOne('http://localhost:8080/api/protected/profile');
+    const req = httpMock.expectOne('/api/protected/profile');
     expect(req.request.method).toBe('POST');
     req.flush(mockProfile);
   });

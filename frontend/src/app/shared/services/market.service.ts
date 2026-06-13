@@ -8,7 +8,7 @@ import { Asset, RatesResponse, HistoryPoint, FiatRates } from '../models/models'
 })
 export class MarketService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api';
+  private apiUrl = '/api';
 
   selectedCurrency = signal<string>('USD');
   searchQuery = signal<string>('');

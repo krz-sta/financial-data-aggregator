@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class UserService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/protected';
+  private apiUrl = '/api/protected';
 
   getProfile(): Observable<any> {
     return this.http.post(`${this.apiUrl}/profile`, {}); 

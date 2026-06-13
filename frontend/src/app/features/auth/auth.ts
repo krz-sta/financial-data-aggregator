@@ -11,7 +11,7 @@ import { email } from '@angular/forms/signals';
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [RouterLink, Header, Footer, FormsModule],
+  imports: [Header, Footer, FormsModule],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
 })
@@ -35,6 +35,7 @@ export class Auth {
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
+  private errorTimer: any;
 
   setMode(mode: 'login' | 'signup') {
     this.router.navigate([], {
@@ -61,7 +62,7 @@ export class Auth {
         },
         error: (err) => {
           this.isLoading.set(false);
-          this.errorMessage.set(err?.error || 'ERROR.');
+          this.showError(err?.error || 'ERROR.');
         }
       });
 
@@ -75,9 +76,17 @@ export class Auth {
         },
         error: (err) => {
           this.isLoading.set(false);
-          this.errorMessage.set(err?.error || 'ERROR.')
+          this.showError(err?.error || 'ERROR.');
         }
       });
     }
+  }
+
+  private showError(msg: string) {
+    this.errorMessage.set(msg);
+    if (this.errorTimer) clearTimeout(this.errorTimer);
+    this.errorTimer = setTimeout(() => {
+      this.errorMessage.set(null);
+    }, 2000);
   }
 }
