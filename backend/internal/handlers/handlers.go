@@ -6,6 +6,7 @@ import (
 	"financial-data-aggregator-backend/internal/handlers/auth"
 	"financial-data-aggregator-backend/internal/handlers/health"
 	"financial-data-aggregator-backend/internal/handlers/portfolio"
+	"financial-data-aggregator-backend/internal/handlers/price"
 	"financial-data-aggregator-backend/internal/handlers/user"
 	"financial-data-aggregator-backend/internal/middleware"
 	"financial-data-aggregator-backend/internal/repository"
@@ -44,10 +45,12 @@ func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Cl
 	healthHandler := health.NewHandler(db)
 	portfolioHandler := portfolio.NewHandler(portfolioService)
 	assetHandler := asset.NewHandler(assetService)
+	priceHandler := price.NewHandler(priceService)
 
 	api := router.Group("/api")
 	{
 		api.GET("/assets", assetHandler.GetAssets)
+		api.GET("/rates", priceHandler.GetRates)
 
 		authGroup := api.Group("/auth")
 		{
