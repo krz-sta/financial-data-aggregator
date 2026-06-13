@@ -44,7 +44,7 @@ func TestPriceService_FullCycle(t *testing.T) {
 	assetSvc := NewAssetService()
 	priceSvc := NewPriceService(client, assetSvc)
 
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 
 	priceSvc.StartWorker(ctx)
@@ -59,4 +59,17 @@ func TestPriceService_FullCycle(t *testing.T) {
 
 	assert.Greater(t, rates["USD"], 0.0)
 	assert.Greater(t, rates["EUR"], 0.0)
+
+	cryptoHistory, err := priceSvc.GetHistory(ctx, "BTC")
+
+	assert.NoError(t, err)
+	assert.NotEmpty(t, cryptoHistory)
+
+	assert.Greater(t, cryptoHistory[0].Price, 0.0)
+	assert.Greater(t, cryptoHistory[0].Timestamp, int64(0))
+
+	fiatHistory, err := priceSvc.GetHistory(ctx, "USD")
+
+	assert.NoError(t, err)
+	assert.Empty(t, fiatHistory)
 }
