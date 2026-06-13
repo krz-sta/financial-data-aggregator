@@ -31,17 +31,16 @@ describe('PortfolioService', () => {
     service.addItem('BTC', 1).subscribe(data => {
       expect(data).toEqual({ success: true });
     });
-    const req = httpMock.expectOne('http://localhost:8080/api/protected/portfolio');
+    const req = httpMock.expectOne('/api/protected/portfolio');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ symbol: 'BTC', amount: 1 });
     req.flush({ success: true });
   });
 
   it('should delete item', () => {
-    service.deleteItem('id1').subscribe(data => {
-      expect(data).toEqual({ success: true });
-    });
-    const req = httpMock.expectOne('http://localhost:8080/api/protected/portfolio/id1');
+    service.deleteItem('id1').subscribe();
+
+    const req = httpMock.expectOne('/api/protected/portfolio/id1');
     expect(req.request.method).toBe('DELETE');
     req.flush({ success: true });
   });

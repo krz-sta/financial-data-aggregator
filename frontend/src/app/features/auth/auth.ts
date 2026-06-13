@@ -11,7 +11,7 @@ import { email } from '@angular/forms/signals';
 @Component({
   selector: 'app-auth',
   standalone: true,
-  imports: [RouterLink, Header, Footer, FormsModule],
+  imports: [Header, Footer, FormsModule],
   templateUrl: './auth.html',
   styleUrl: './auth.scss',
 })

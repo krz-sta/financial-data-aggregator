@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
 })
 export class PortfolioService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/protected/portfolio';
+  private apiUrl = '/api/protected/portfolio';
 
   addItem(symbol: string, amount: number): Observable<any> {
     return this.http.post(this.apiUrl, { symbol, amount });

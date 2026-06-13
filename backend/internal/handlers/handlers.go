@@ -11,6 +11,7 @@ import (
 	"financial-data-aggregator-backend/internal/middleware"
 	"financial-data-aggregator-backend/internal/repository"
 	"financial-data-aggregator-backend/internal/service"
+	"os"
 	"time"
 
 	"github.com/gin-contrib/cors"
@@ -20,8 +21,13 @@ import (
 )
 
 func SetupRoutes(router *gin.Engine, db *gorm.DB, jwtKey string, redis *redis.Client) {
+	corsOrigin := os.Getenv("CORS_ORIGIN")
+	if corsOrigin == "" {
+		corsOrigin = "http://localhost:4200"
+	}
+
 	router.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:4200"},
+		AllowOrigins:     []string{corsOrigin},
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Accept", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

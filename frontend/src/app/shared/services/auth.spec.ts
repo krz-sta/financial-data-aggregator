@@ -30,7 +30,7 @@ describe('AuthService', () => {
 
   it('should login and set token', () => {
     service.login({ email: 'test@test.com', password: 'password' }).subscribe();
-    const req = httpMock.expectOne('http://localhost:8080/api/auth/login');
+    const req = httpMock.expectOne('/api/auth/login');
     expect(req.request.method).toBe('POST');
     req.flush({ token: 'fake-token' });
     expect(localStorage.getItem('auth_token')).toBe('fake-token');
@@ -38,8 +38,11 @@ describe('AuthService', () => {
   });
 
   it('should register', () => {
-    service.register({ email: 'test@test.com', name: 'Test', password: 'password' }).subscribe();
-    const req = httpMock.expectOne('http://localhost:8080/api/auth/register');
+    const payload = { email: 'test@test.com', password: 'password', name: 'Test' };
+    
+    service.register(payload).subscribe();
+
+    const req = httpMock.expectOne('/api/auth/register');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual({ email: 'test@test.com', displayName: 'Test', password: 'password' });
     req.flush({ success: true });

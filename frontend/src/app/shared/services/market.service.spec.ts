@@ -32,27 +32,29 @@ describe('MarketService', () => {
     service.getAssets().subscribe(data => {
       expect(data).toEqual(mockAssets);
     });
-    const req = httpMock.expectOne('http://localhost:8080/api/assets');
+    const req = httpMock.expectOne('/api/assets');
     expect(req.request.method).toBe('GET');
     req.flush(mockAssets);
   });
 
   it('should get history', () => {
-    const mockData = [{ timestamp: 123, price: 50000 }];
+    const mockHistory = [{ timestamp: 123, price: 50000 }];
+    
     service.getHistory('BTC').subscribe(data => {
-      expect(data).toEqual(mockData);
+      expect(data).toEqual(mockHistory);
     });
-    const req = httpMock.expectOne('http://localhost:8080/api/rates/history/BTC');
+    const req = httpMock.expectOne('/api/rates/history/BTC');
     expect(req.request.method).toBe('GET');
-    req.flush(mockData);
+    req.flush(mockHistory);
   });
 
   it('should get rates', () => {
-    const mockRates = { BTC: 50000, ETH: 3000 };
+    const mockRates = { BTC: { usd: 50000 } };
+    
     service.getRates().subscribe(data => {
       expect(data).toEqual(mockRates);
     });
-    const req = httpMock.expectOne('http://localhost:8080/api/rates');
+    const req = httpMock.expectOne('/api/rates');
     expect(req.request.method).toBe('GET');
     req.flush(mockRates);
   });
