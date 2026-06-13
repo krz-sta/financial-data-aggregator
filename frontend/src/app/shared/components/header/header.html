@@ -2,31 +2,44 @@
     <div class="max-w-7xl mx-auto px-6 py-4">
         <div class="flex items-center justify-between w-full">
 
-            <div class="flex items-center gap-3 w-1/3">
+            <div class="flex items-center gap-3 w-1/4 sm:w-1/3">
                 <div class="w-6 h-6 border border-white flex items-center justify-center">
                     <svg lucideTrendingUp class="w-3.5 h-3.5 text-white"></svg>
                 </div>
-                <span class="text-sm font-mono text-white tracking-widest">fin<span class="text-zinc-400">.</span>data</span>
+                <span class="text-sm font-mono text-white tracking-widest hidden sm:inline-block">fin<span class="text-zinc-400">.</span>data</span>
             </div>
 
-            <div class="flex justify-center w-1/3">
-                @if (!isAuthPage()) {
+            <div class="flex justify-center w-2/4 sm:w-1/3">
+                @if (!isAuthPage() && isLoggedIn()) {
                     <div class="relative w-full max-w-md">
                         <svg lucideSearch class="absolute left-3 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-zinc-600"></svg>
                         <input
                             type="text"
-                            placeholder="Search markets"
+                            [value]="marketService.searchQuery()"
+                            (input)="marketService.searchQuery.set($any($event.target).value)"
+                            placeholder="Search portfolio..."
                             class="w-full pl-9 pr-3 py-2 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
                         />
                     </div>
                 }
             </div>
 
-            <div class="flex justify-end w-1/3">
+            <div class="flex justify-end w-1/4 sm:w-1/3">
                 @if (isLoggedIn()) {
-                    <div class="flex items-center gap-2">
+                    <div class="flex items-center gap-4">
+                        
+                        <select 
+                        [value]="marketService.selectedCurrency()"
+                        (change)="marketService.selectedCurrency.set($any($event.target).value)"
+                        class="bg-black text-xs font-mono text-zinc-300 border border-zinc-800 py-2 px-2 focus:outline-none focus:border-zinc-600 hidden sm:block">
+                            <option value="USD">USD</option>
+                            <option value="EUR">EUR</option>
+                            <option value="PLN">PLN</option>
+                            <option value="GBP">GBP</option>
+                        </select>
+
                         @if (!isHomePage()) {
-                            <button routerLink="/home" class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest">
+                            <button routerLink="/home" class="px-4 py-2 text-xs font-mono text-zinc-400 hover:text-white transition-colors tracking-widest hidden sm:block">
                                 DASHBOARD
                             </button>
                         }
