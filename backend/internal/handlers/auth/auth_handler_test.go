@@ -3,6 +3,7 @@ package auth
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"financial-data-aggregator-backend/internal/models"
 	"net/http"
 	"net/http/httptest"
@@ -60,6 +61,19 @@ func TestRegister(t *testing.T) {
 		assert.Equal(t, http.StatusBadRequest, w.Code)
 	})
 
+	t.Run("Service Error", func(t *testing.T) {
+		reqBody := models.RegisterInput{Email: "error@test.com", Name: "Error User", Password: "password123"}
+		jsonBody, _ := json.Marshal(reqBody)
+
+		mockService.On("Register", "error@test.com", "Error User", "password123").Return((*models.User)(nil), errors.New("db error")).Once()
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/api/auth/register", bytes.NewBuffer(jsonBody))
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusInternalServerError, w.Code)
+	})
+
 	mockService.AssertExpectations(t)
 }
 
@@ -82,6 +96,27 @@ func TestLogin(t *testing.T) {
 		router.ServeHTTP(w, req)
 
 		assert.Equal(t, http.StatusOK, w.Code)
+	})
+
+	t.Run("Bad Request", func(t *testing.T) {
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer([]byte(`{"invalid"}`)))
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusBadRequest, w.Code)
+	})
+
+	t.Run("Unauthorized", func(t *testing.T) {
+		reqBody := models.LoginInput{Email: "wrong@test.com", Password: "wrongpassword"}
+		jsonBody, _ := json.Marshal(reqBody)
+
+		mockService.On("Login", "wrong@test.com", "wrongpassword").Return("", errors.New("invalid auth")).Once()
+
+		w := httptest.NewRecorder()
+		req, _ := http.NewRequest("POST", "/api/auth/login", bytes.NewBuffer(jsonBody))
+		router.ServeHTTP(w, req)
+
+		assert.Equal(t, http.StatusUnauthorized, w.Code)
 	})
 
 	mockService.AssertExpectations(t)
