@@ -13,12 +13,10 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
-// Tworzymy poprawnego mocka dla PriceService
 type MockPriceService struct {
 	mock.Mock
 }
 
-// Interfejs PriceService wymaga zaimplementowania 3 poniższych metod:
 func (m *MockPriceService) StartWorker(ctx context.Context) {
 	m.Called(ctx)
 }
@@ -47,13 +45,12 @@ func TestGetRates(t *testing.T) {
 	router := gin.New()
 	router.GET("/api/rates", handler.GetRates)
 
-	t.Run("Success", func(t *testing.T) {
+	t.Run("Successs", func(t *testing.T) {
 		mockRates := map[string]float64{
 			"BTC": 50000.0,
 			"ETH": 3000.0,
 		}
 
-		// Używamy mock.Anything, ponieważ w Handlerze przekazujesz ctx.Request.Context()
 		mockService.On("GetRates", mock.Anything).Return(mockRates).Once()
 
 		w := httptest.NewRecorder()
@@ -89,7 +86,6 @@ func TestGetHistory(t *testing.T) {
 	})
 
 	t.Run("Service Error", func(t *testing.T) {
-		// Mockujemy błąd API dla nieobsługiwanego aktywa
 		mockService.On("GetHistory", mock.Anything, "INVALID").Return(([]models.HistoryPoint)(nil), errors.New("unsupported asset")).Once()
 
 		w := httptest.NewRecorder()
