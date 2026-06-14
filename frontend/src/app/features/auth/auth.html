@@ -19,7 +19,7 @@
 
         @if (authMode() === 'signup') {
         <div>
-          <label class="block text-xs font-mono text-zinc-500 mb-2 tracking-widest">NAME</label>
+          <label for="signupName" class="block text-xs font-mono text-zinc-500 mb-2 tracking-widest">NAME</label>
           <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -27,7 +27,7 @@
               <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
-            <input type="text" name="name" [(ngModel)]="formData().name"
+            <input type="text" id="signupName" name="name" [(ngModel)]="formData().name"
               class="w-full pl-10 pr-4 py-3 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
               placeholder="Enter your name" [required]="authMode() === 'signup'" />
           </div>
@@ -35,7 +35,7 @@
         }
 
         <div>
-          <label class="block text-xs font-mono text-zinc-500 mb-2 tracking-widest">EMAIL</label>
+          <label for="emailInput" class="block text-xs font-mono text-zinc-500 mb-2 tracking-widest">EMAIL</label>
           <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -43,14 +43,14 @@
               <rect width="20" height="16" x="2" y="4" rx="2" />
               <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
             </svg>
-            <input type="email" name="email" [(ngModel)]="formData().email"
+            <input type="email" id="emailInput" name="email" [(ngModel)]="formData().email"
               class="w-full pl-10 pr-4 py-3 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
               placeholder="Enter your email" required />
           </div>
         </div>
 
         <div>
-          <label class="block text-xs font-mono text-zinc-500 mb-2 tracking-widest">PASSWORD</label>
+          <label for="passwordInput" class="block text-xs font-mono text-zinc-500 mb-2 tracking-widest">PASSWORD</label>
           <div class="relative">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor"
               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
@@ -58,7 +58,7 @@
               <rect width="18" height="11" x="3" y="11" rx="2" ry="2" />
               <path d="M7 11V7a5 5 0 0 1 10 0v4" />
             </svg>
-            <input type="password" name="password" [(ngModel)]="formData().password"
+            <input type="password" id="passwordInput" name="password" [(ngModel)]="formData().password"
               class="w-full pl-10 pr-4 py-3 bg-black border border-zinc-800 focus:outline-none focus:border-zinc-700 text-sm text-white placeholder-zinc-600 font-mono"
               placeholder="Enter your password" required />
           </div>

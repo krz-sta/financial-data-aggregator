@@ -32,7 +32,7 @@ func setupRedisContainer(t *testing.T) (*redis.Client, func()) {
 	})
 
 	cleanup := func() {
-		redisC.Terminate(ctx)
+		_ = redisC.Terminate(ctx)
 	}
 	return client, cleanup
 }

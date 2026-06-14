@@ -81,7 +81,7 @@ describe('Home Component', () => {
   it('should handle add asset success', () => {
     component.addForm.set({ symbol: 'BTC', amount: 1 });
     vi.spyOn(portfolioService, 'addItem').mockReturnValue(of({ success: true }));
-    const loadSpy = vi.spyOn(component, 'loadProfile').mockImplementation(() => {});
+    const loadSpy = vi.spyOn(component, 'loadProfile').mockImplementation(vi.fn());
 
     component.handleAddAsset(new Event('submit'));
 
@@ -105,7 +105,7 @@ describe('Home Component', () => {
 
   it('should delete group', () => {
     vi.spyOn(portfolioService, 'deleteItem').mockReturnValue(of({ success: true }));
-    const loadSpy = vi.spyOn(component, 'loadProfile').mockImplementation(() => {});
+    vi.spyOn(component, 'loadProfile').mockImplementation(vi.fn());
     
     component.handleDeleteGroup(['id1', 'id2'], new Event('click'));
     

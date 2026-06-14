@@ -6,7 +6,7 @@ import { MarketService } from '../../shared/services/market.service';
 import { CurrencyPipe, DecimalPipe } from '@angular/common';
 import { CustomSelectComponent } from '../../shared/components/select/select';
 import { forkJoin } from 'rxjs';
-import { HistoryPoint, RatesResponse } from '../../shared/models/models';
+import { HistoryPoint } from '../../shared/models/models';
 
 @Component({
   selector: 'app-chart',
@@ -257,7 +257,7 @@ export class Chart implements OnInit, OnDestroy, AfterViewInit {
     this.resizeObserver.observe(wrapper);
   }
 
-  private drawChart(hoveredIdx: number = -1) {
+  private drawChart(hoveredIdx = -1) {
     const canvas = this.chartCanvas?.nativeElement;
     const wrapper = this.chartWrapper?.nativeElement;
     const data = this.filteredChartData();

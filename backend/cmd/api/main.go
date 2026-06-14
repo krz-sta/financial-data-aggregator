@@ -33,10 +33,18 @@ func main() {
 	if err != nil {
 		log.Fatalf("Couldn't connect to redis: %v", err.Error())
 	}
-	defer redis.Close()
+
+	defer func() {
+		if err := redis.Close(); err != nil {
+			log.Printf("failed to close redis: %v", err)
+		}
+	}()
+
 	fmt.Println("Connected to redis")
 
 	handlers.SetupRoutes(router, db, cfg.JWTKey, redis)
 
-	router.Run(cfg.Router.GetRouterConfig())
+	if err := router.Run(cfg.Router.GetRouterConfig()); err != nil {
+		log.Fatalf("server failed: %v", err)
+	}
 }
