@@ -1,80 +1,121 @@
 # Financial Data Aggregator
 
-System agregacji i monitorowania portfela aktywów finansowych. Zrealizowany w architekturze rozproszonej, podzielony na niezależne komponenty backendu i frontendu, uruchamiany w środowisku kontenerowym.
+[![Go](https://img.shields.io/badge/Go-1.21+-00ADD8?style=for-the-badge&logo=go)](https://golang.org/)
+[![Angular](https://img.shields.io/badge/Angular-DD0031?style=for-the-badge&logo=angular&logoColor=white)](https://angular.io/)
+[![Docker](https://img.shields.io/badge/Docker-2CA5E0?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://redis.io/)
 
-## 1. Architektura i Stos Technologiczny
+Aplikacja webowa służąca do agregacji danych finansowych oraz zarządzania własnym portfelem inwestycyjnym. 
 
-Backend:
-- Język: Go 1.25
-- Framework HTTP: Gin Gonic
-- ORM: GORM (driver: postgres)
-- Uwierzytelnianie: JWT (JSON Web Tokens) bezstanowe
-- Testy: testify, testcontainers-go
+---
 
-Frontend:
-- Framework: Angular 21 (TypeScript)
-- Arkusze stylów: SCSS, TailwindCSS
-- Serwer HTTP (PROD): Nginx (konfiguracja: nginx.conf)
+## Stos technologiczny
 
-Bazy danych:
-- Główna baza danych: PostgreSQL 15 (przechowywanie profili użytkowników, portfeli)
-- Cache: Redis 9 (buforowanie zapytań rynkowych, ograniczanie rate limitów API zewnętrznych)
+### Backend
+* **Język:** Go
+* **Framework:** Gin
+* **ORM:** GORM
+* **Architektura:** Wzorzec CSR (Controllers (Handlers), Services, Repositories)
 
-Infrastruktura:
-- Konteneryzacja: Docker
-- Orkiestracja: Docker Compose (osobne pliki dla DEV i PROD)
-- CI/CD: GitHub Actions (automatyzacja testów, linterów i budowy obrazów)
+### Frontend
+* **Język:** TypeScript
+* **Framework:** Angular, TailwindCSS
 
-## 2. Zgodność z The Twelve-Factor App
+### Infrastruktura & Bazy danych
+* **Baza główna:** PostgreSQL (dane użytkowników, transakcje, portfolio)
+* **Cache:** Redis (cache cen aktywów)
+* **Konteneryzacja:** Docker, Docker Compose
+* **Serwer WWW / Proxy:** Nginx
 
-1. Codebase: Jedno repozytorium (monorepo) z kodem aplikacji i infrastruktury.
-2. Dependencies: Zależności izolowane przez Dockera oraz pliki go.mod i package.json.
-3. Config: Konfiguracja oddzielona od kodu, oparta na zmiennych środowiskowych (plik .env).
-4. Backing services: PostgreSQL i Redis uruchamiane jako odrębne kontenery i podłączane przez sieć Dockera.
-5. Stateless: Backend nie przechowuje stanu sesji w pamięci (zastosowanie JWT).
-6. Build, release, run: Wielofazowe budowanie obrazów (Multi-stage builds) oddzielające kompilację od środowiska uruchomieniowego (obrazy oparte na Alpine).
+---
 
-## 3. Zmienne Środowiskowe (.env)
+## Model architektury
 
-Zmienne wymagane do uruchomienia środowiska:
+System opiera się na architekturze mikroserwisowej z wyodrębnionym backendem i frontendem, które komunikują się za pomocą REST API.
 
-DB_HOST
-DB_PORT
-DB_USER
-DB_PASSWORD
-DB_NAME
-REDIS_HOST
-REDIS_PORT
-REDIS_PASSWORD
-ROUTER_HOST
-ROUTER_PORT
-JWT_SECRET
+```mermaid
+sequenceDiagram
+    participant F as Frontend (Angular)
+    participant P as Proxy (Nginx)
+    participant B as Backend (Go API)
+    participant R as Cache (Redis)
+    participant D as Baza Danych (PostgreSQL)
+    participant E as Zewnętrzne API
 
-## 4. Instrukcja Uruchomienia
+    rect rgb(200, 220, 250)
+    Note over B, E: PROCES W TLE (Worker - priceService.StartWorker)
+    loop Cykliczna aktualizacja
+        B->>E: Zapytanie o aktualne kursy aktywów
+        E-->>B: Odpowiedź z nowymi wycenami
+        B->>R: Zapisz aktualne wyceny (Cache)
+    end
+    end
 
-Wymagania: Docker, Docker Compose.
-Przed uruchomieniem należy skopiować plik .env.example do .env i uzupełnić parametry.
+    rect rgb(230, 250, 230)
+    Note over F, R: KLIENT POBIERA KURSY (Brak autoryzacji)
+    F->>P: HTTP GET /api/rates
+    P->>B: Przekazanie żądania do PriceHandler
+    B->>R: Odczyt zapisanych wycen z pamięci
+    R-->>B: Zwrócenie błyskawicznych wyników
+    B-->>P: Odpowiedź JSON z kursami
+    P-->>F: Wyświetlenie danych
+    end
 
-Środowisko deweloperskie (Hot Reloading):
-> docker compose up --build
-- Frontend: http://localhost:4200
-- Backend: http://localhost:8080
+    rect rgb(250, 230, 230)
+    Note over F, D: KLIENT ZARZĄDZA PORTFELEM (Wymagany JWT)
+    F->>P: HTTP POST /api/protected/portfolio
+    P->>B: Przekazanie żądania (AuthMiddleware)
+    B->>B: Weryfikacja tokenu JWT
+    B->>D: Zapis nowego aktywa (PortfolioService -> Repo)
+    D-->>B: Potwierdzenie zapisu w bazie
+    B-->>P: Status 200 OK
+    P-->>F: Komunikat: "item added to portfolio"
+    end
+```
 
-Środowisko produkcyjne (Frontend serwowany przez Nginx, minimalne obrazy):
-> docker compose -f docker-compose.prod.yml up --build -d
-- Frontend (Nginx): http://localhost:80
-- Backend: http://localhost:8080
+* [Dokumentacja API](docs/models/api.md)
+* [Model bazy danych](docs/models/db_model.md)
 
-## 5. Konfiguracja Testów Integracyjnych (Testcontainers)
+---
 
-Testy warstwy repozytorium zaimplementowano z użyciem biblioteki testcontainers-go. 
-Proces testowania "go test ./...":
-1. Pobiera obraz postgres:15-alpine z rejestru.
-2. Uruchamia efemeryczny kontener testowy.
-3. Wykonuje Auto-Migracje GORM.
-4. Przeprowadza operacje DML sprawdzające zgodność zapytań z dialektem PostgreSQL.
-5. Wysyła sygnał przerwania (Terminate) i usuwa kontener z hosta.
+## Instrukcja uruchomienia (Docker)
 
-## 6. Wykonali
- - Krzysztof Stasiak
- - Stanisław Rak
+Aplikacja jest w pełni skonteneryzowana. Aby uruchomić projekt lokalnie, upewnij się, że masz zainstalowanego **Dockera** oraz **Docker Compose**.
+
+### Krok 1: Klonowanie repozytorium
+```bash
+git clone [https://github.com/r4qq/financial-data-aggregator.git](https://github.com/r4qq/financial-data-aggregator.git)
+cd financial-data-aggregator
+```
+
+### Krok 2: Konfiguracja środowiska
+Skopiuj przykładowy plik konfiguracyjny i dostosuj go:
+```bash
+cp .env.example .env
+```
+
+### Krok 3: Uruchomienie aplikacji
+Aby zbudować i uruchomić wszystkie kontenery (Baza danych, Cache, Backend, Frontend) w tle, wykonaj:
+```bash
+docker-compose up -d --build
+```
+
+### Krok 4: Weryfikacja działania
+Po udanym uruchomieniu aplikacja będzie dostępna pod następującymi adresami:
+* **Frontend:** `http://localhost:80`
+* **Backend API:** `http://localhost:8080/api`
+
+---
+
+## Live:
+
+Projekt został wdrozony i jest dostępny pod adresem:
+**[Live](https://fin.krzysztofstasiak.pl/)**
+
+---
+
+## Autorzy:
+
+ * Krzysztof Stasiak
+ * Stanisław Rak
