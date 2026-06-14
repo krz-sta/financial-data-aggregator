@@ -14,9 +14,9 @@ describe('Chart Component', () => {
 
   beforeEach(async () => {
     (window as any).ResizeObserver = class {
-      observe() {}
-      unobserve() {}
-      disconnect() {}
+      observe = vi.fn();
+      unobserve = vi.fn();
+      disconnect = vi.fn();
     };
     await TestBed.configureTestingModule({
       imports: [Chart],
@@ -134,7 +134,7 @@ describe('Chart Component', () => {
     const mockEvent = { clientX: 100, clientY: 100 } as MouseEvent;
     
     component.chartCanvas.nativeElement.getBoundingClientRect = () => ({
-      left: 0, top: 0, width: 800, height: 600, right: 800, bottom: 600, x: 0, y: 0, toJSON: () => {}
+      left: 0, top: 0, width: 800, height: 600, right: 800, bottom: 600, x: 0, y: 0, toJSON: vi.fn()
     });
 
     component.onCanvasMouseMove(mockEvent);
@@ -155,18 +155,18 @@ describe('Chart Component', () => {
     expect(component.priceChange()).toBeDefined();
 
     const ctx = {
-      fillRect: () => {},
-      scale: () => {},
-      beginPath: () => {},
-      moveTo: () => {},
-      lineTo: () => {},
-      stroke: () => {},
-      fillText: () => {},
-      createLinearGradient: () => ({ addColorStop: () => {} }),
-      closePath: () => {},
-      fill: () => {},
-      arc: () => {},
-      setLineDash: () => {},
+      fillRect: vi.fn(),
+      scale: vi.fn(),
+      beginPath: vi.fn(),
+      moveTo: vi.fn(),
+      lineTo: vi.fn(),
+      stroke: vi.fn(),
+      fillText: vi.fn(),
+      createLinearGradient: vi.fn().mockReturnValue({ addColorStop: vi.fn() }),
+      closePath: vi.fn(),
+      fill: vi.fn(),
+      arc: vi.fn(),
+      setLineDash: vi.fn(),
     };
     component.chartCanvas.nativeElement.getContext = () => ctx as any;
     (component as any).drawChart(1);

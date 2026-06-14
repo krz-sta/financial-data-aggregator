@@ -41,8 +41,9 @@
             
             <form (submit)="handleAddAsset($event)" class="flex flex-col sm:flex-row gap-4 items-end">
                 <div class="flex-1 w-full">
-                    <label class="block text-xs font-mono text-zinc-500 mb-2">ASSET SYMBOL</label>
+                    <label for="assetSymbol" class="block text-xs font-mono text-zinc-500 mb-2">ASSET SYMBOL</label>
                     <app-select 
+                        id="assetSymbol"
                         [ngModel]="addForm().symbol" 
                         (ngModelChange)="addForm().symbol = $event"
                         name="symbol"
@@ -52,8 +53,9 @@
                 </div>
 
                 <div class="flex-1 w-full">
-                    <label class="block text-xs font-mono text-zinc-500 mb-2">AMOUNT</label>
+                    <label for="assetAmount" class="block text-xs font-mono text-zinc-500 mb-2">AMOUNT</label>
                     <input 
+                        id="assetAmount"
                         type="number" 
                         [ngModel]="addForm().amount"
                         (ngModelChange)="addForm().amount = $event"
@@ -84,11 +86,11 @@
                     @for (item of filteredPortfolio(); track item.symbol) {
                         <div class="p-4 border border-zinc-800 flex flex-col sm:flex-row justify-between sm:items-center gap-3 group hover:border-zinc-500 bg-black hover:bg-zinc-950 transition-all overflow-hidden">
                             <div>
-                                <span
+                                <button type="button"
                                     (click)="handleRowClick(item.symbol)"
-                                    class="font-bold font-mono text-lg block cursor-pointer hover:underline w-fit">
+                                    class="font-bold font-mono text-lg block cursor-pointer hover:underline w-fit text-left">
                                     {{ item.symbol }}
-                                </span>
+                                </button>
                                 <span class="text-zinc-500 font-mono text-sm">TOTAL AMOUNT: {{ item.amount }}</span>
                             </div>
                             

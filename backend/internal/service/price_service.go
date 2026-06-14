@@ -126,7 +126,10 @@ func (s *priceService) GetHistory(ctx context.Context, symbol string) ([]models.
 	if err != nil {
 		return nil, err
 	}
-	defer res.Body.Close()
+
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	var result struct {
 		Prices [][]float64 `json:"prices"`
@@ -174,7 +177,10 @@ func (s *priceService) fetchCrypto(ctx context.Context, assets []models.AssetInf
 		log.Printf("coinngecko fetch error: %v", err.Error())
 		return
 	}
-	defer res.Body.Close()
+
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	var result map[string]map[string]float64
 	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {
@@ -234,7 +240,10 @@ func (s *priceService) fetchFiat(ctx context.Context, assets []models.AssetInfo)
 		log.Printf("frankfurt fetch failed: %v", err.Error())
 		return
 	}
-	defer res.Body.Close()
+
+	defer func() {
+		_ = res.Body.Close()
+	}()
 
 	var result []models.FrankfurterAsset
 	if err := json.NewDecoder(res.Body).Decode(&result); err != nil {

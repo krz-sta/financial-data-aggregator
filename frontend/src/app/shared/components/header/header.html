@@ -23,11 +23,11 @@
                         @if (marketService.searchQuery() && searchResults().length > 0) {
                             <div class="absolute top-full left-0 w-full mt-2 bg-black border border-zinc-800 shadow-xl z-50">
                                 @for (result of searchResults(); track result.symbol) {
-                                    <div class="p-3 border-b border-zinc-800 last:border-0 hover:bg-zinc-900 cursor-pointer flex justify-between items-center" 
+                                    <button type="button" class="w-full p-3 border-b border-zinc-800 last:border-0 hover:bg-zinc-900 cursor-pointer flex justify-between items-center" 
                                          (click)="handleResultClick(result.symbol)">
-                                        <span class="font-mono text-white text-sm tracking-widest font-bold">{{ result.symbol }}</span>
+                                        <span class="font-mono text-white text-sm tracking-widest font-bold text-left">{{ result.symbol }}</span>
                                         <span class="font-mono text-zinc-500 text-xs truncate max-w-[60%] text-right">{{ result.name }}</span>
-                                    </div>
+                                    </button>
                                 }
                             </div>
                         }

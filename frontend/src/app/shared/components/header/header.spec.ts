@@ -1,8 +1,8 @@
 import { TestBed, ComponentFixture } from '@angular/core/testing';
-import { provideRouter, Router, NavigationEnd } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { of, throwError, Subject } from 'rxjs';
+import { of, throwError } from 'rxjs';
 import { Header } from './header';
 import { AuthService } from '../../services/auth';
 import { MarketService } from '../../services/market.service';
@@ -48,7 +48,7 @@ describe('Header Component', () => {
 
   it('should handle fetch assets error on init', () => {
     vi.spyOn(marketService, 'getAssets').mockReturnValue(throwError(() => new Error('error')));
-    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleSpy = vi.spyOn(console, 'error').mockImplementation(vi.fn());
     component.ngOnInit();
     expect(consoleSpy).toHaveBeenCalled();
   });
