@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/google/uuid"
@@ -25,6 +26,19 @@ func TestPortfolioService_AddItem(t *testing.T) {
 		assert.Error(t, err)
 		assert.Equal(t, "wrong id format", err.Error())
 	})
+
+	t.Run("Repository Error", func(t *testing.T) {
+		mockRepoErr := new(MockPortfolioRepository)
+		serviceErr := NewPortfolioService(mockRepoErr)
+
+		mockRepoErr.On("AddItem", mock.AnythingOfType("*models.PortfolioItem")).Return(errors.New("db error")).Once()
+
+		err := serviceErr.AddItem(userID, "AAPL", 10.5)
+		assert.Error(t, err)
+		assert.Equal(t, "db error", err.Error())
+		mockRepoErr.AssertExpectations(t)
+	})
+
 	mockRepo.AssertExpectations(t)
 }
 
@@ -45,6 +59,24 @@ func TestPortfolioService_DeleteItem(t *testing.T) {
 		err := service.DeleteItem("invalid", itemUUID.String())
 		assert.Error(t, err)
 		assert.Equal(t, "incorrect id format", err.Error())
+	})
+
+	t.Run("Invalid Item ID", func(t *testing.T) {
+		err := service.DeleteItem(userUUID.String(), "invalid-item-id")
+		assert.Error(t, err)
+		assert.Equal(t, "incorrect id format", err.Error())
+	})
+
+	t.Run("Repository Error", func(t *testing.T) {
+		mockRepoErr := new(MockPortfolioRepository)
+		serviceErr := NewPortfolioService(mockRepoErr)
+
+		mockRepoErr.On("DeleteItem", userUUID, itemUUID).Return(errors.New("db delete error")).Once()
+
+		err := serviceErr.DeleteItem(userUUID.String(), itemUUID.String())
+		assert.Error(t, err)
+		assert.Equal(t, "db delete error", err.Error())
+		mockRepoErr.AssertExpectations(t)
 	})
 
 	mockRepo.AssertExpectations(t)

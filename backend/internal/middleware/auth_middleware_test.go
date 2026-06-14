@@ -65,6 +65,19 @@ func TestMiddleware(t *testing.T) {
 			payload:        "Bearer" + " " + generateTestToken("testUser", time.Now().Add(time.Hour), jwt_secret),
 			expectedStatus: http.StatusOK,
 		},
+		{
+			name: "Missing sub claim",
+			payload: "Bearer " + func() string {
+				testClaims := jwt.MapClaims{
+					"exp": float64(time.Now().Add(time.Hour).Unix()),
+					"iat": time.Now().Unix(),
+				}
+				testToken := jwt.NewWithClaims(jwt.SigningMethodHS256, testClaims)
+				str, _ := testToken.SignedString([]byte(jwt_secret))
+				return str
+			}(),
+			expectedStatus: http.StatusUnauthorized,
+		},
 	}
 
 	gin.SetMode(gin.TestMode)
