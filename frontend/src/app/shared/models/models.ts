@@ -18,15 +18,11 @@ export interface UserProfile {
   createdAt: string;
 }
 
-export interface RatesResponse {
-  [symbol: string]: number;
-}
+export type RatesResponse = Record<string, number>;
 
 export interface HistoryPoint {
   timestamp: number;
   price: number;
 }
 
-export interface FiatRates {
-  [currency: string]: number;
-}
+export type FiatRates = Record<string, number>;

@@ -51,11 +51,11 @@ export class Home implements OnInit {
 
   groupedPortfolio = computed(() => {
     const portfolio = this.profileData()?.portfolio || [];
-    const map = new Map<string, any>();
+    const map = new Map<string, { symbol: string, amount: number, ids: string[] }>();
     
     for (const item of portfolio) {
       if (map.has(item.symbol)) {
-        const existing = map.get(item.symbol);
+        const existing = map.get(item.symbol)!;
         existing.amount += item.amount;
         existing.ids.push(item.id);
       } else {
@@ -79,7 +79,7 @@ export class Home implements OnInit {
 
     if (!portfolio.length || !currentRates) return 0;
 
-    return portfolio.reduce((total: number, item: any) => {
+    return portfolio.reduce((total: number, item: { symbol: string, amount: number, ids: string[] }) => {
       return total + this.marketService.convertCryptoToFiat(item.amount, item.symbol, currentRates);
     }, 0);
   });
@@ -120,7 +120,7 @@ export class Home implements OnInit {
       next: (data) => {
         this.profileData.set(data as UserProfile);
       },
-      error: (err) => {
+      error: () => {
         this.error.set('Failed to refresh profile data.');
       }
     });

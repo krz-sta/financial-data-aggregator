@@ -45,6 +45,9 @@
         @for (option of filteredOptions(); track $index) {
         <li
           (click)="selectOption(option)"
+          (keydown.enter)="selectOption(option)"
+          (keyup.space)="selectOption(option)"
+          tabindex="0"
           (mouseenter)="focusedIndex = $index"
           class="px-4 py-3 text-sm cursor-pointer transition-all duration-150 text-zinc-400 select-none flex items-center justify-between"
           [class.bg-zinc-900]="focusedIndex === $index"

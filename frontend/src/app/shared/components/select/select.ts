@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, forwardRef, ElementRef, HostListener, computed, signal } from '@angular/core';
+import { Component, Input, Output, EventEmitter, forwardRef, ElementRef, HostListener, computed, signal, inject } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -20,10 +20,10 @@ export class CustomSelectComponent implements ControlValueAccessor {
   @Input() options: any[] = [];
   @Input() bindValue?: string;
   @Input() bindLabel?: string;
-  @Input() placeholder: string = 'Select option';
-  @Input() disabled: boolean = false;
+  @Input() placeholder = 'Select option';
+  @Input() disabled = false;
   @Input() id?: string;
-  @Input() searchable: boolean = true;
+  @Input() searchable = true;
 
   searchQuery = signal<string>('');
 
@@ -63,10 +63,12 @@ export class CustomSelectComponent implements ControlValueAccessor {
     return opts.filter(opt => this.getLabel(opt).toLowerCase().includes(query));
   });
 
-  onChange: any = () => {};
-  onTouched: any = () => {};
+  onChange: any = () => { /* no-op */ };
+  onTouched: any = () => { /* no-op */ };
 
-  constructor(private elementRef: ElementRef) {}
+  private elementRef = inject(ElementRef);
+
+  constructor() { /* no-op */ }
 
   writeValue(value: any): void {
     this._value = value;
